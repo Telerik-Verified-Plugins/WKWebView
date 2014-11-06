@@ -13,7 +13,7 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen)
 
 _BETA_ - things will likely break atm, [please post your feedback :)](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues)
 
-* Allows you to use the new WKWebView on iOS 8.
+* Allows you to use the new WKWebView on iOS 8 (the simulator is supported as well).
 * Falls back to UIWebView on iOS 7 and lower.
 * Will hopefully cease to exist soon (when Apple releases a fixed WKWebView so Cordova can use it without the hacks I needed to apply)
 
