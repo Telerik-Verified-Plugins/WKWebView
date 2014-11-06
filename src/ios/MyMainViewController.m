@@ -221,7 +221,7 @@
   // Configure WebView
   // TODO
 //  _webViewDelegate = [[CDVWebViewDelegate alloc] initWithDelegate:self];
-//  self.wkWebView.delegate = _webViewDelegate;
+  self.wkWebView.navigationDelegate = self; // [WKNavigationDelegate alloc];
   
   // register this viewcontroller with the NSURLProtocol, only after the User-Agent is set
   [CDVURLProtocol registerViewController:self];
@@ -316,6 +316,7 @@
     if ([self settingForKey:@"SuppressesIncrementalRendering"] != nil) {
       if ([self settingForKey:@"SuppressesIncrementalRendering"]) {
         suppressesIncrementalRendering = [(NSNumber*)[self settingForKey:@"SuppressesIncrementalRendering"] boolValue];
+        self.wkWebView.configuration.suppressesIncrementalRendering = [[self settingForKey:@"SuppressesIncrementalRendering"] boolValue];
       }
     }
     
@@ -481,6 +482,21 @@
     return [super webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
 }
 */
+
+#pragma mark WKNavigationDelegate implementation
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+
+  if (!navigationAction.targetFrame) {
+    // links with target="_blank" need to open outside the app, but WKWebView doesn't allow it currently
+    NSURL *url = navigationAction.request.URL;
+    NSLog(@"Navigating to %@", url);
+    UIApplication *app = [UIApplication sharedApplication];
+    if ([app canOpenURL:url]) {
+      [app openURL:url];
+    }
+  }
+  decisionHandler(WKNavigationActionPolicyAllow);
+}
 
 #pragma mark WKScriptMessageHandler implementation
 
