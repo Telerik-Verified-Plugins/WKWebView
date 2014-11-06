@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="nl.x-services.plugins.wkwebview"
+        version="0.0.1">
+
+  <name>WKWebview Polyfill</name>
+
+  <description>
+    A drop-in replacement of UIWebView for boosted performance and enhanced HTML5 support
+  </description>
+
+  <license>MIT</license>
+
+  <engines>
+    <engine name="cordova" version=">=3.0.0"/>
+  </engines>
+
+  <!-- ios -->
+  <platform name="ios">
+
+    <config-file target="config.xml" parent="/*">
+      <feature name="WKWebViewPolyfill">
+        <param name="ios-package" value="WKWebViewPolyfill"/>
+      </feature>
+    </config-file>
+
+    <framework src="WebKit.framework" />
+
+    <!-- the controller loading the WKWebView -->
+    <header-file src="src/ios/MyMainViewController.h"/>
+    <source-file src="src/ios/MyMainViewController.m"/>
+
+    <!-- the class which swaps in our controller -->
+    <source-file src="src/ios/AppDelegate+WKWebViewPolyfill.m"/>
+
+    <!-- helper classes -->
+    <header-file src="src/ios/ReroutingUIWebView.h"/>
+    <source-file src="src/ios/ReroutingUIWebView.m"/>
+    <header-file src="src/ios/CDVWebViewOperationsDelegate.h"/>
+    <source-file src="src/ios/CDVWebViewOperationsDelegate.m"/>
+    <header-file src="src/ios/CDVWebViewUIDelegate.h"/>
+    <source-file src="src/ios/CDVWebViewUIDelegate.m"/>
+  </platform>
+
+</plugin>
