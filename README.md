@@ -34,7 +34,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Quircks
-Loading local files via XHR fails currenty. See #2 for details.
+Loading local files via XHR fails currenty. See [#2] for details.
 
 ## 5. Credits
 This plugin was inspired by the hard work of the Apache Cordova team [(and most notably Shazron)](https://github.com/shazron/WKWebViewFIleUrlTest).
