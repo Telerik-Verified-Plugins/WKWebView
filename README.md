@@ -6,7 +6,8 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen)
 1. [Description](#1-description)
 2. [Screenshot](#2-screenshot)
 3. [Installation](#3-installation)
-4. [License](#4-license)
+4. [Credits](#4-credits)
+5. [License](#5-license)
 
 ## 1. Description
 
@@ -33,7 +34,11 @@ $ cordova prepare
 
 No need for anything else!
 
-## 4. License
+## 4. Credits
+This plugin was inspired by the hard work of the Apache Cordova team [(and most notably Shazron)](https://github.com/shazron/WKWebViewFIleUrlTest).
+
+
+## 5. License
 
 [The MIT License (MIT)](http://www.opensource.org/licenses/mit-license.html)
 
