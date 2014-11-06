@@ -11,12 +11,10 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen)
 
 ## 1. Description
 
-Allows you to use the new WKWebView on iOS 8.
-Falls back to UIWebView on iOS 7 and lower.
-
 _BETA_ - things will likely break atm, [please post your feedback :)](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues)
 
-* Requires building with XCode 6 (iOS 8 SDK)
+* Allows you to use the new WKWebView on iOS 8.
+* Falls back to UIWebView on iOS 7 and lower.
 * Will hopefully cease to exist soon (when Apple releases a fixed WKWebView so Cordova can use it without the hacks I needed to apply)
 
 ## 2. Screenshot
@@ -32,7 +30,7 @@ $ cordova plugin add https://github.com/EddyVerbruggen/cordova-plugin-wkwebview
 $ cordova prepare
 ```
 
-No need for anything else!
+No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Credits
 This plugin was inspired by the hard work of the Apache Cordova team [(and most notably Shazron)](https://github.com/shazron/WKWebViewFIleUrlTest).
