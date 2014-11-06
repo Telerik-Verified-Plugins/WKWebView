@@ -6,8 +6,9 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen)
 1. [Description](#1-description)
 2. [Screenshot](#2-screenshot)
 3. [Installation](#3-installation)
-4. [Credits](#4-credits)
-5. [License](#5-license)
+4. [Quircks](#4-quircks)
+5. [Credits](#5-credits)
+6. [License](#6-license)
 
 ## 1. Description
 
@@ -32,11 +33,13 @@ $ cordova prepare
 
 No need for anything else - you can now open the project in XCode 6 if you like.
 
-## 4. Credits
+## 4. Quircks
+Loading local files via XHR fails currenty. See #2 for details.
+
+## 5. Credits
 This plugin was inspired by the hard work of the Apache Cordova team [(and most notably Shazron)](https://github.com/shazron/WKWebViewFIleUrlTest).
 
-
-## 5. License
+## 6. License
 
 [The MIT License (MIT)](http://www.opensource.org/licenses/mit-license.html)
 
