@@ -13,7 +13,7 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen)
 Allows you to use the new WKWebView on iOS 8.
 Falls back to UIWebView on iOS 7 and lower.
 
-_BETA_ - things will likely break atm, [please post your feedback :)](issues)
+_BETA_ - things will likely break atm, [please post your feedback :)](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues)
 
 * Requires building with XCode 6 (iOS 8 SDK)
 * Will hopefully cease to exist soon (when Apple releases a fixed WKWebView so Cordova can use it without the hacks I needed to apply)
@@ -22,7 +22,7 @@ _BETA_ - things will likely break atm, [please post your feedback :)](issues)
 This image shows the [SocialSharing plugin] in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe.
 It's a screenshot of the [demo app](demo/index.html).
 
-<img src="screenshots/UIWebView-vs-WKWebView.png" width="845" height="766"/>
+<img src="screenshots/UIWebView-vs-WKWebView.png" width="700"/>
 
 ## 3. Installation
 
