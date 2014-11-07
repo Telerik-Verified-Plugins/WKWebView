@@ -19,7 +19,7 @@ _BETA_ - things will likely break atm, [please post your feedback :)](https://gi
 * Will hopefully cease to exist soon (when Apple releases a fixed WKWebView so Cordova can use it without the hacks I needed to apply)
 
 ## 2. Screenshot
-This image shows the [SocialSharing plugin] in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe.
+This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe.
 It's a screenshot of the [demo app](demo/index.html).
 
 <img src="screenshots/UIWebView-vs-WKWebView.png" width="700"/>
@@ -35,6 +35,8 @@ No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Quircks
 Loading local files via XHR fails currenty. See [#2](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues/2) for details.
+
+Using [Ionic](http://ionicframework.com/)? Check [this comment](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues/2#issuecomment-62200543).
 
 ## 5. Credits
 This plugin was inspired by the hard work of the Apache Cordova team [(and most notably Shazron)](https://github.com/shazron/WKWebViewFIleUrlTest).
