@@ -12,11 +12,12 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen)
 
 ## 1. Description
 
-_BETA_ - things will likely break atm, [please post your feedback :)](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues)
+_BETA_ (a little less with v0.1.0) - things may break, [please post your feedback :)](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues)
 
 * Allows you to use the new WKWebView on iOS 8 (the simulator is supported as well).
 * Falls back to UIWebView on iOS 7 and lower.
 * Will hopefully cease to exist soon (when Apple releases a fixed WKWebView so Cordova can use it without the hacks I needed to apply)
+* Your log will show some warnings but that's almost entirely down to the (otherwise excellent) embedded [CocoaHTTPServer](https://github.com/robbiehanson/CocoaHTTPServer).
 
 ## 2. Screenshot
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
