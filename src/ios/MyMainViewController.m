@@ -42,7 +42,7 @@
   
   webViewBounds.origin = self.view.bounds.origin;
   
-  self.wkWebView = [self newCordovaViewWithFrame:webViewBounds];
+  self.wkWebView = [self newCordovaWKWebViewWithFrame:webViewBounds];
   self.wkWebView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
 
   _webViewOperationsDelegate = [[CDVWebViewOperationsDelegate alloc] initWithWebView:self.webView];
@@ -428,7 +428,7 @@
   }];
 }
 
-- (WKWebView*)newCordovaViewWithFrame:(CGRect)bounds
+- (WKWebView*)newCordovaWKWebViewWithFrame:(CGRect)bounds
 {
     WKWebView* cordovaView = nil;
   

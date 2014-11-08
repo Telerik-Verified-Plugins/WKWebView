@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <!--
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+ -->
 <html>
 <head>
   <meta charset="utf-8" />
@@ -29,17 +29,23 @@
 </head>
 <body>
 <div class="app">
-  <h1>Apache Cordova</h1>
+  <h1>First page</h1>
   <div id="deviceready" class="blink">
     <p class="event listening">Connecting to Device</p>
     <p class="event received">Device is Ready</p>
     <button onclick="testLocalstorage()">testLocalstorage</button><br/><br/>
     <button onclick="window.plugins.socialsharing.share('Message only', null, null, null, function(msg) {alert(msg)}, function(msg) {alert(msg)})">social sharing (needs plugin)</button><br/><br/>
-    <button onclick="alert(device.cordova)">device test (needs plugin)</button>
+    <button onclick="alert('running cordova ' + device.cordova + ' on ' + device.platform)">device test (needs plugin)</button>
+    <button onclick="loadXHR()">XHR</button>
+    <br/>
+    <br/>
+    <a href="http://www.x-services.nl/blog" target="_blank">external link</a>
+
   </div>
 </div>
 <script type="text/javascript" src="cordova.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
 <script>
   window.onerror = function(msg, file, line) {
     alert(msg + '; ' + file + '; ' + line);
@@ -47,9 +53,33 @@
 
   function testLocalstorage() {
     localStorage.setItem("foo", "bar");
-    alert(localStorage.getItem("foo"));
+    alert("stored and retrieved from LS: " + localStorage.getItem("foo"));
+  }
+
+  function loadXHR() {
+    !function(get){
+      XMLHttpRequest.prototype.get = function (data) {
+        alert("xhr get: " + data);
+        get.call(this, data);
+      }
+    }(XMLHttpRequest.prototype.get);
+
+    !function(send){
+      XMLHttpRequest.prototype.send = function (data) {
+        alert("xhr send: " + data);
+        send.call(this, data);
+      }
+    }(XMLHttpRequest.prototype.send);
+
+    $.ajax({
+      url: "secondpage.html"
+    }).done(function() {
+      alert('done');
+    }).fail(function(msg) {
+      alert('fail: ' + JSON.stringify(msg));
+    });
   }
 </script>
-<iframe src="https://www.scirra.com/demos/c2/particles/"></iframe>
+<!--iframe src="https://www.scirra.com/demos/c2/particles/"></iframe-->
 </body>
 </html>

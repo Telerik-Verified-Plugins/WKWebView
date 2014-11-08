@@ -1,11 +1,20 @@
 #import <objc/runtime.h>
 #import "AppDelegate.h"
+#import "AppDelegate+WKWebViewPolyfill.h"
 #import "MyMainViewController.h"
 
 // need to swap out a method, so swizzling it here
 static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelector);
 
-@implementation AppDelegate (IdentityUrlHandling)
+@implementation WKWebViewPolyfill
+- (void) loadFile:(CDVInvokedUrlCommand*)command {
+  NSString *file = [command.arguments objectAtIndex:0];
+  CDVPluginResult * pluginResult;
+}
+
+@end
+
+@implementation AppDelegate (WKWebViewPolyfill)
 
 + (void)load {
   // swap in our own viewcontroller which loads the wkwebview, but only in case we're running iOS 8+

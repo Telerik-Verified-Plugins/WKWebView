@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="nl.x-services.plugins.wkwebview"
-        version="0.0.1">
+        version="0.0.2">
 
-  <name>WKWebview Polyfill</name>
+  <name>WKWebView Polyfill</name>
 
   <description>
     A drop-in replacement of UIWebView for boosted performance and enhanced HTML5 support
@@ -15,6 +15,10 @@
     <engine name="cordova" version=">=3.0.0"/>
   </engines>
 
+  <js-module src="www/WKWebViewPolyfill.js" name="WKWebViewPolyfill">
+    <clobbers target="window.plugins.wkwebview" />
+  </js-module>
+
   <!-- ios -->
   <platform name="ios">
 
@@ -24,13 +28,19 @@
       </feature>
     </config-file>
 
+    <!-- For WKWebView -->
     <framework src="WebKit.framework" />
+    <!-- For CocoaHTTPServer -->
+    <framework src="CFNetwork.framework" />
+    <framework src="Security.framework" />
+    <!--<framework src="Foundation.framework" />-->
 
     <!-- the controller loading the WKWebView -->
     <header-file src="src/ios/MyMainViewController.h"/>
     <source-file src="src/ios/MyMainViewController.m"/>
 
-    <!-- the class which swaps in our controller -->
+    <!-- the class which swaps in our controller and offers helper methods for the JS API -->
+    <source-file src="src/ios/AppDelegate+WKWebViewPolyfill.h"/>
     <source-file src="src/ios/AppDelegate+WKWebViewPolyfill.m"/>
 
     <!-- helper classes -->
@@ -40,6 +50,59 @@
     <source-file src="src/ios/CDVWebViewOperationsDelegate.m"/>
     <header-file src="src/ios/CDVWebViewUIDelegate.h"/>
     <source-file src="src/ios/CDVWebViewUIDelegate.m"/>
+
+    <!-- CocoaHTTPServer, used for supporting XHR loading of resources (like AngularJS templateUrl or jQuery's $.ajax) -->
+    <header-file src="src/ios/CocoaHTTPServer/Core/Categories/DDData.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/Categories/DDData.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/Categories/DDNumber.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/Categories/DDNumber.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/Categories/DDRange.h"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/Categories/DDRange.m"/>
+
+    <header-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPAsyncFileResponse.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPAsyncFileResponse.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPDataResponse.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPDataResponse.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPDynamicFileResponse.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPDynamicFileResponse.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPFileResponse.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPFileResponse.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPRedirectResponse.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPRedirectResponse.m"/>
+
+    <header-file src="src/ios/CocoaHTTPServer/Core/HTTPAuthenticationRequest.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/HTTPAuthenticationRequest.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/HTTPConnection.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/HTTPConnection.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/HTTPLogging.h"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/HTTPMessage.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/HTTPMessage.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/HTTPResponse.h"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/HTTPServer.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/HTTPServer.m"/>
+    <header-file src="src/ios/CocoaHTTPServer/Core/WebSocket.h"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/WebSocket.m"/>
+
+    <header-file src="src/ios/CocoaHTTPserver/Vendor/CocoaAsyncSocket/GCDAsyncSocket.h"/>
+    <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaAsyncSocket/GCDAsyncSocket.m"/>
+
+    <header-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/Extensions/ContextFilterLogFormatter.h"/>
+    <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/Extensions/ContextFilterLogFormatter.m"/>
+    <header-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/Extensions/DispatchQueueLogFormatter.h"/>
+    <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/Extensions/DispatchQueueLogFormatter.m"/>
+    <header-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDAbstractDatabaseLogger.h"/>
+    <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDAbstractDatabaseLogger.m"/>
+    <header-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDASLLogger.h"/>
+    <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDASLLogger.m"/>
+    <header-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDFileLogger.h"/>
+    <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDFileLogger.m"/>
+    <header-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDLog.h"/>
+    <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDLog.m"/>
+    <header-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDTTYLogger.h"/>
+    <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDTTYLogger.m"/>
+
+    <!-- TODO frameworks cordova http depends on -->
+
   </platform>
 
 </plugin>
