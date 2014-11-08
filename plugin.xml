@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="nl.x-services.plugins.wkwebview"
-        version="0.0.2">
+        version="0.1.0">
 
   <name>WKWebView Polyfill</name>
 
@@ -14,10 +14,6 @@
   <engines>
     <engine name="cordova" version=">=3.0.0"/>
   </engines>
-
-  <js-module src="www/WKWebViewPolyfill.js" name="WKWebViewPolyfill">
-    <clobbers target="window.plugins.wkwebview" />
-  </js-module>
 
   <!-- ios -->
   <platform name="ios">
@@ -57,7 +53,7 @@
     <header-file src="src/ios/CocoaHTTPServer/Core/Categories/DDNumber.h"/>
     <source-file src="src/ios/CocoaHTTPServer/Core/Categories/DDNumber.m"/>
     <header-file src="src/ios/CocoaHTTPServer/Core/Categories/DDRange.h"/>
-    <header-file src="src/ios/CocoaHTTPServer/Core/Categories/DDRange.m"/>
+    <source-file src="src/ios/CocoaHTTPServer/Core/Categories/DDRange.m"/>
 
     <header-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPAsyncFileResponse.h"/>
     <source-file src="src/ios/CocoaHTTPServer/Core/Responses/HTTPAsyncFileResponse.m"/>

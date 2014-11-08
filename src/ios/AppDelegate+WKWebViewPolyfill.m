@@ -48,8 +48,9 @@ static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelect
   httpServer = [[HTTPServer alloc] init];
 
   // just setting a fixed port for now - may change this transparantly to a dynamic value later
-  [httpServer setPort:12344];
-  
+  int httpPort = 12344;
+  [httpServer setPort:httpPort];
+
   // Serve files from our embedded Web folder
   NSString *webPath = myMainViewController.wwwFolderName;
   DDLogInfo(@"Setting document root: %@", webPath);
@@ -57,7 +58,23 @@ static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelect
   [httpServer setDocumentRoot:webPath];
   
   [self startServer];
-  
+
+  // now auto-wire any XHR calls to change their protocol to HTTP and call our embedded server
+  NSMutableString *script = [[NSMutableString alloc]init];
+  [script appendString:@"\
+    (function() {\
+      var proxied = window.XMLHttpRequest.prototype.open;\
+      window.XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {\
+        if (method == 'GET' && url.indexOf('://') == -1) {\
+          arguments[1] = 'http://localhost:"];
+  [script appendString:[NSString stringWithFormat:@"%d", httpPort]];
+  [script appendString:@"/' + url;\
+        }\
+        return proxied.apply(this, arguments);\
+      };\
+    })();"];
+  [myMainViewController.wkWebView evaluateJavaScript:script completionHandler:nil];
+
   return YES;
 }
 
