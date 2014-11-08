@@ -6,7 +6,7 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen)
 1. [Description](#1-description)
 2. [Screenshot](#2-screenshot)
 3. [Installation](#3-installation)
-4. [Quircks](#4-quircks)
+4. [Changelog](#4-changelog)
 5. [Credits](#5-credits)
 6. [License](#6-license)
 
@@ -33,12 +33,9 @@ $ cordova prepare
 
 No need for anything else - you can now open the project in XCode 6 if you like.
 
-## 4. Quircks
-Update nov 8th: This will be fixed in a matter of hours - stay tuned.
-
-Loading local files via XHR fails currenty. See [#2](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues/2) for details.
-
-Using [Ionic](http://ionicframework.com/)? Check [this comment](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues/2#issuecomment-62200543).
+## 4. Changelog
+0.1.0  Added support for loading local files via XHR. This should now transparently work for $.ajax, AngularJS templateUrl's, etc. To this end the plugin adds an embedded HTTP server on port 12344 which is stopped when the app is put to sleep or exits.
+0.0.1  Initial version
 
 ## 5. Credits
 This plugin was inspired by the hard work of the Apache Cordova team [(and most notably Shazron)](https://github.com/shazron/WKWebViewFIleUrlTest).
