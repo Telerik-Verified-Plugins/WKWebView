@@ -3,15 +3,18 @@
 #import "AppDelegate+WKWebViewPolyfill.h"
 #import "MyMainViewController.h"
 
+#import "HTTPServer.h"
+#import "DDLog.h"
+#import "DDTTYLogger.h"
+
+// Log levels for the embedded HTTP server: off, error, warn, info, verbose
+static const int ddLogLevel = LOG_LEVEL_VERBOSE;
+
 // need to swap out a method, so swizzling it here
 static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelector);
 
 @implementation WKWebViewPolyfill
-- (void) loadFile:(CDVInvokedUrlCommand*)command {
-  NSString *file = [command.arguments objectAtIndex:0];
-  CDVPluginResult * pluginResult;
-}
-
+  // nothing yet
 @end
 
 @implementation AppDelegate (WKWebViewPolyfill)
@@ -30,9 +33,30 @@ static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelect
   
   self.window = [[UIWindow alloc] initWithFrame:screenBounds];
   self.window.autoresizesSubviews = YES;
-  self.viewController = [[MyMainViewController alloc] init];
-  self.window.rootViewController = self.viewController;
+  MyMainViewController *myMainViewController = [[MyMainViewController alloc] init];
+  self.viewController = myMainViewController;
+  self.window.rootViewController = myMainViewController;
   [self.window makeKeyAndVisible];
+  
+  // CocoaHTTPServer stuff below, for local file loading via XHR over http:// (instead of file://)
+  
+  // Configure our logging framework.
+  // To keep things simple and fast, we're just going to log to the Xcode console.
+  [DDLog addLogger:[DDTTYLogger sharedInstance]];
+  
+  // Create server using our custom MyHTTPServer class
+  httpServer = [[HTTPServer alloc] init];
+
+  // just setting a fixed port for now - may change this transparantly to a dynamic value later
+  [httpServer setPort:12344];
+  
+  // Serve files from our embedded Web folder
+  NSString *webPath = myMainViewController.wwwFolderName;
+  DDLogInfo(@"Setting document root: %@", webPath);
+  
+  [httpServer setDocumentRoot:webPath];
+  
+  [self startServer];
   
   return YES;
 }
@@ -41,10 +65,41 @@ static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelect
                      openURL: (NSURL *)url
            sourceApplication: (NSString *)sourceApplication
                   annotation: (id)annotation {
-
-    // call super
+  
+  // call super
   return [self identity_application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
+
+- (void)startServer
+{
+  // Start the server (and check for problems)
+  NSError *error;
+  if([httpServer start:&error])
+  {
+    DDLogInfo(@"Started HTTP Server on port %hu", [httpServer listeningPort]);
+  }
+  else
+  {
+    DDLogError(@"Error starting HTTP Server: %@", error);
+  }
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+  [self startServer];
+  DDLogInfo(@"Restarted HTTP Server on port %hu", [httpServer listeningPort]);
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+  // There is no public(allowed in AppStore) method for iOS to run continiously in the background for our purposes (serving HTTP).
+  // So, we stop the server when the app is paused (if a users exits from the app or locks a device) and
+  // restart the server when the app is resumed (based on this document: http://developer.apple.com/library/ios/#technotes/tn2277/_index.html )
+  
+  DDLogInfo(@"Stopped HTTP Server on port %hu", [httpServer listeningPort]);
+  [httpServer stop];
+}
+
 @end
 
 

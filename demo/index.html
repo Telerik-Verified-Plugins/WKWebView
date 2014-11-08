@@ -33,13 +33,17 @@
   <div id="deviceready" class="blink">
     <p class="event listening">Connecting to Device</p>
     <p class="event received">Device is Ready</p>
-    <button onclick="testLocalstorage()">testLocalstorage</button><br/><br/>
-    <button onclick="window.plugins.socialsharing.share('Message only', null, null, null, function(msg) {alert(msg)}, function(msg) {alert(msg)})">social sharing (needs plugin)</button><br/><br/>
+    <button onclick="testLocalstorage()">testLocalstorage</button><br/>
+    <button onclick="window.plugins.socialsharing.share('Message only', null, null, null, function(msg) {alert(msg)}, function(msg) {alert(msg)})">social sharing (needs plugin)</button>
+    <br/>
     <button onclick="alert('running cordova ' + device.cordova + ' on ' + device.platform)">device test (needs plugin)</button>
-    <button onclick="loadXHR()">XHR</button>
+    <br/>
+    <button onclick="loadXHR()">Load file via embedded HTTP server</button>
+    <br/>
+    <button onclick="document.getElementById('webglFrame').src='https://www.scirra.com/demos/c2/particles/'">load webgl iframe</button>
     <br/>
     <br/>
-    <a href="http://www.x-services.nl/blog" target="_blank">external link</a>
+    <a href="https://github.com/eddyverbruggen" target="_blank">Test an external link</a>
 
   </div>
 </div>
@@ -56,30 +60,28 @@
     alert("stored and retrieved from LS: " + localStorage.getItem("foo"));
   }
 
-  function loadXHR() {
-    !function(get){
-      XMLHttpRequest.prototype.get = function (data) {
-        alert("xhr get: " + data);
-        get.call(this, data);
+  // reroute protocol-less GET requests to our embedded http server to defeat Origin null issues
+  (function() {
+    var proxied = window.XMLHttpRequest.prototype.open;
+    window.XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+      if (method == "GET" && url.indexOf("://") == -1) {
+        arguments[1] = "http://localhost:12344/" + url;
       }
-    }(XMLHttpRequest.prototype.get);
+      return proxied.apply(this, arguments);
+    };
+  })();
 
-    !function(send){
-      XMLHttpRequest.prototype.send = function (data) {
-        alert("xhr send: " + data);
-        send.call(this, data);
-      }
-    }(XMLHttpRequest.prototype.send);
+  function loadXHR() {
 
     $.ajax({
-      url: "secondpage.html"
-    }).done(function() {
-      alert('done');
+      url: "loadMeByXHR.txt" // will be dynamically prefix with http://
+    }).done(function(msg) {
+      alert('done: ' + msg);
     }).fail(function(msg) {
       alert('fail: ' + JSON.stringify(msg));
     });
   }
 </script>
-<!--iframe src="https://www.scirra.com/demos/c2/particles/"></iframe-->
+<iframe id="webglFrame" src="" frameborder="0"></iframe>
 </body>
 </html>
