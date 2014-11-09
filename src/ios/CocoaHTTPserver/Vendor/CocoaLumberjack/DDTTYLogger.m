@@ -673,30 +673,7 @@ static DDTTYLogger *sharedInstance;
 	
 	// iOS
 	
-	if ([color respondsToSelector:@selector(getRed:green:blue:alpha:)])
-	{
-		[color getRed:rPtr green:gPtr blue:bPtr alpha:NULL];
-	}
-	else
-	{
-		// The method getRed:green:blue:alpha: was only available starting iOS 5.
-		// So in iOS 4 and earlier, we have to jump through hoops.
-		
-		CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-		
-		unsigned char pixel[4];
-		CGContextRef context = CGBitmapContextCreate(&pixel, 1, 1, 8, 4, rgbColorSpace, kCGImageAlphaNoneSkipLast);
-		
-		CGContextSetFillColorWithColor(context, [color CGColor]);
-		CGContextFillRect(context, CGRectMake(0, 0, 1, 1));
-		
-		if (rPtr) { *rPtr = pixel[0] / 255.0f; }
-		if (gPtr) { *gPtr = pixel[1] / 255.0f; }
-		if (bPtr) { *bPtr = pixel[2] / 255.0f; }
-		
-		CGContextRelease(context);
-		CGColorSpaceRelease(rgbColorSpace);
-	}
+  [color getRed:rPtr green:gPtr blue:bPtr alpha:NULL];
 	
 	#else
 	

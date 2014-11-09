@@ -3,7 +3,7 @@
 #import <WebKit/WebKit.h>
 #import <WebKit/WKWebView.h>
 
-@interface MyMainViewController : MainViewController <WKScriptMessageHandler> {
+@interface MyMainViewController : MainViewController <WKScriptMessageHandler, WKNavigationDelegate> {
   @protected CDVWebViewOperationsDelegate* _webViewOperationsDelegate;
 }
 

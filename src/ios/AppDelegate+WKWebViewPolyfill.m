@@ -1,6 +1,5 @@
 #import <objc/runtime.h>
 #import "AppDelegate.h"
-#import "AppDelegate+WKWebViewPolyfill.h"
 #import "MyMainViewController.h"
 
 #import "HTTPServer.h"
@@ -13,9 +12,8 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 // need to swap out a method, so swizzling it here
 static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelector);
 
-@implementation WKWebViewPolyfill
-  // nothing yet
-@end
+@class HTTPServer;
+HTTPServer *httpServer;
 
 @implementation AppDelegate (WKWebViewPolyfill)
 

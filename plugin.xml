@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="nl.x-services.plugins.wkwebview"
-        version="0.1.0">
+        version="0.1.1">
 
   <name>WKWebView Polyfill</name>
 
@@ -29,14 +29,12 @@
     <!-- For CocoaHTTPServer -->
     <framework src="CFNetwork.framework" />
     <framework src="Security.framework" />
-    <!--<framework src="Foundation.framework" />-->
 
     <!-- the controller loading the WKWebView -->
     <header-file src="src/ios/MyMainViewController.h"/>
     <source-file src="src/ios/MyMainViewController.m"/>
 
     <!-- the class which swaps in our controller and offers helper methods for the JS API -->
-    <source-file src="src/ios/AppDelegate+WKWebViewPolyfill.h"/>
     <source-file src="src/ios/AppDelegate+WKWebViewPolyfill.m"/>
 
     <!-- helper classes -->
@@ -96,8 +94,6 @@
     <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDLog.m"/>
     <header-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDTTYLogger.h"/>
     <source-file src="src/ios/CocoaHTTPserver/Vendor/CocoaLumberjack/DDTTYLogger.m"/>
-
-    <!-- TODO frameworks cordova http depends on -->
 
   </platform>
 

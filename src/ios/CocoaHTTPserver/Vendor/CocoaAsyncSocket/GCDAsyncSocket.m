@@ -1042,7 +1042,7 @@ enum GCDAsyncSocketConfig
 {
 	LogInfo(@"%@ - %@ (start)", THIS_METHOD, self);
 	
-	if (dispatch_get_current_queue() == socketQueue)
+	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
 	{
 		[self closeWithError:nil];
 	}
@@ -6254,7 +6254,7 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 	
 	// 5. kCFStreamSSLAllowsExpiredCertificates
 	
-	value = [tlsSettings objectForKey:(NSString *)kCFStreamSSLAllowsExpiredCertificates];
+  value = nil; //[tlsSettings objectForKey:(NSString *)kCFStreamSSLAllowsExpiredCertificates];
 	if (value)
 	{
 		#if TARGET_OS_IPHONE
@@ -6695,7 +6695,7 @@ static OSStatus SSLWriteFunction(SSLConnectionRef connection, const void *data, 
 	// So we'll just create a timer that will never fire - unless the server runs for decades.
 	[NSTimer scheduledTimerWithTimeInterval:[[NSDate distantFuture] timeIntervalSinceNow]
 	                                 target:self
-	                               selector:@selector(doNothingAtAll:)
+	                               selector:nil //@selector(doNothingAtAll:)
 	                               userInfo:nil
 	                                repeats:YES];
 	

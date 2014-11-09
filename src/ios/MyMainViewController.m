@@ -219,9 +219,7 @@
   [self.wkWebView loadRequest: [NSURLRequest requestWithURL:appURL]];
 
   // Configure WebView
-  // TODO
-//  _webViewDelegate = [[CDVWebViewDelegate alloc] initWithDelegate:self];
-  self.wkWebView.navigationDelegate = self; // [WKNavigationDelegate alloc];
+  self.wkWebView.navigationDelegate = self;
   
   // register this viewcontroller with the NSURLProtocol, only after the User-Agent is set
   [CDVURLProtocol registerViewController:self];
