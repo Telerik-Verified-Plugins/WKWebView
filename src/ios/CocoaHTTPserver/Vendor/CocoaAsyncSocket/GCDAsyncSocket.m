@@ -1042,7 +1042,7 @@ enum GCDAsyncSocketConfig
 {
 	LogInfo(@"%@ - %@ (start)", THIS_METHOD, self);
 	
-	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+	if (dispatch_get_current_queue() == socketQueue)
 	{
 		[self closeWithError:nil];
 	}
