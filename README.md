@@ -20,6 +20,7 @@ _BETA_ (a little less with v0.1.0) - things may break, [please post your feedbac
 * As a matter of fact, [Apache is working on a similar plugin (which you can't use at the moment of writing)](https://github.com/apache/cordova-plugins/tree/master/wkwebview-engine) which I came across after releasing version 0.1.1. It targets Cordova 3.7.0 and up whereas this plugin is supported on 3.0.0 an up. 
 * Your log will show some warnings but that's almost entirely down to the (otherwise excellent) embedded [CocoaHTTPServer](https://github.com/robbiehanson/CocoaHTTPServer).
 * [Ionic](http://ionicframework.com/) tip: to prevent flashes of a black background, make sure you set `ion-nav-view`'s `background-color` to `transparent`.
+* Note that at the moment LocalStorage is NOT automatically transferred from the old webview to the new one.
 
 ## 2. Screenshot
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
