@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="nl.x-services.plugins.wkwebview"
-        version="0.1.1">
+        version="0.1.2">
 
   <name>WKWebView Polyfill</name>
 
