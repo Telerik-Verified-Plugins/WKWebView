@@ -23,15 +23,27 @@
 
 - (id)init
 {
-    self = [super init];
-    if (self) {
-      // copy all files from www to tmp to work around the WKWebView local file loading issue
-      NSURL* startURL = [NSURL URLWithString:self.startPage];
-      NSString* startFilePath = [self.commandDelegate pathForResource:[startURL path]];
-      startFilePath = [startFilePath stringByDeletingLastPathComponent];
-      [self copyBundleWWWFolderToFolder:startFilePath];
-    }
-    return self;
+  self = [super init];
+  if (self) {
+    // copy all files from www to tmp to work around the WKWebView local file loading issue
+    NSURL* startURL = [NSURL URLWithString:self.startPage];
+    NSString* startFilePath = [self.commandDelegate pathForResource:[startURL path]];
+    startFilePath = [startFilePath stringByDeletingLastPathComponent];
+    [self copyBundleWWWFolderToFolder:startFilePath];
+  }
+  
+  // configure listeners which fires when the application goes away
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(copyLocalStorageToUIWebView:)
+                                               name:UIApplicationWillTerminateNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(copyLocalStorageToUIWebView:)
+                                               name:UIApplicationWillResignActiveNotification object:nil];
+  return self;
+}
+
+- (void)copyLocalStorageToUIWebView:(NSNotification*)notification {
+  if (self.uiWebViewLS != nil && self.wkWebViewLS != nil) {
+    [[CDVLocalStorage class] copyFrom:self.wkWebViewLS to:self.uiWebViewLS error:nil];
+  }
 }
 
 #pragma mark View lifecycle
@@ -220,7 +232,7 @@
 
   // Configure WebView
   self.wkWebView.navigationDelegate = self;
-  
+
   // register this viewcontroller with the NSURLProtocol, only after the User-Agent is set
   [CDVURLProtocol registerViewController:self];
   
@@ -241,7 +253,23 @@
    */
   if (IsAtLeastiOSVersion(@"5.1") && (([backupWebStorageType isEqualToString:@"local"]) ||
                                       ([backupWebStorageType isEqualToString:@"cloud"] && !IsAtLeastiOSVersion(@"6.0")))) {
-    [self registerPlugin:[[CDVLocalStorage alloc] initWithWebView:self.webView] withClassName:NSStringFromClass([CDVLocalStorage class])];
+    CDVLocalStorage *ls = [CDVLocalStorage alloc];
+    [self registerPlugin:[ls initWithWebView:self.webView] withClassName:NSStringFromClass([CDVLocalStorage class])];
+    
+    // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)
+    for (CDVBackupInfo* info in ls.backupInfo) {
+      if ([info.label isEqualToString:@"localStorage database"]) {
+        self.uiWebViewLS = info.original;
+        NSString* bundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+        NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+        NSString *libraryDir = [dirPaths objectAtIndex:0];
+        self.wkWebViewLS = [[NSString alloc] initWithString: [libraryDir stringByAppendingPathComponent:@"WebKit"]];
+        self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:bundleIdentifier];
+        self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/file__0.localstorage"];
+        [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
+        break;
+      }
+    }
   }
   
   /*
@@ -453,7 +481,6 @@
     return cordovaView;
 }
 
-
 #pragma mark WKNavigationDelegate implementation
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
@@ -465,7 +492,6 @@
   [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
 }
 
-#pragma mark WKNavigationDelegate implementation
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
 
   if (!navigationAction.targetFrame) {

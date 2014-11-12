@@ -9,4 +9,8 @@
 
 @property (nonatomic, strong) IBOutlet UIWebView* webView;
 @property (nonatomic, strong) IBOutlet WKWebView* wkWebView;
+
+@property (nonatomic, readwrite, copy) NSString* uiWebViewLS;
+@property (nonatomic, readwrite, copy) NSString* wkWebViewLS;
+
 @end

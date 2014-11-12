@@ -12,7 +12,7 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen) / [Telerik](http://www.t
 
 ## 1. Description
 
-_BETA_ (a little less with v0.1.0) - things may break, [please post your feedback :)](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues)
+_BETA_ (a little less with __0.1.0__) - things may break, [please post your feedback :)](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues)
 
 * Allows you to use the new WKWebView on iOS 8 (the simulator is supported as well).
 * Falls back to UIWebView on iOS 7 and lower.
@@ -26,7 +26,7 @@ _BETA_ (a little less with v0.1.0) - things may break, [please post your feedbac
 
 ### BUGS / Caveats
 
-* Note that at the moment [LocalStorage is NOT automatically transferred from the old webview to the new one](#7). This is not an issue for new apps, but it is when you drop it into an existing one and store f.i. logins in localstorage.
+* __Fixed in 0.2.0__: Note that at the moment [LocalStorage is NOT automatically transferred from the old webview to the new one](#7). This is not an issue for new apps, but it is when you drop it into an existing one and store f.i. logins in localstorage.
 
 ## 2. Screenshot
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
@@ -44,6 +44,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.2.0__  LocalStorage sync between UIWebView and WKWebView
 * __0.1.3__  Compatibility with [InAppBrowser](https://github.com/apache/cordova-plugin-inappbrowser)
 * __0.1.2__  Compatibility with plugins like [Toast](https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin) which add a subview to the webview (they didn't show)
 * __0.1.1__  Cleanup to get rid of a few (deprecation) warnings - lots left (on purpose) because they're thrown by a 3rd party framework and can be safely ignored
