@@ -253,24 +253,20 @@
    */
   if (IsAtLeastiOSVersion(@"5.1") && (([backupWebStorageType isEqualToString:@"local"]) ||
                                       ([backupWebStorageType isEqualToString:@"cloud"] && !IsAtLeastiOSVersion(@"6.0")))) {
-    CDVLocalStorage *ls = [CDVLocalStorage alloc];
-    [self registerPlugin:[ls initWithWebView:self.webView] withClassName:NSStringFromClass([CDVLocalStorage class])];
-    
-    // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)
-    for (CDVBackupInfo* info in ls.backupInfo) {
-      if ([info.label isEqualToString:@"localStorage database"]) {
-        self.uiWebViewLS = info.original;
-        NSString* bundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
-        NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-        NSString *libraryDir = [dirPaths objectAtIndex:0];
-        self.wkWebViewLS = [[NSString alloc] initWithString: [libraryDir stringByAppendingPathComponent:@"WebKit"]];
-        self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:bundleIdentifier];
-        self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/file__0.localstorage"];
-        [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
-        break;
-      }
-    }
-  }
+    [self registerPlugin:[[CDVLocalStorage alloc] initWithWebView:self.webView] withClassName:NSStringFromClass([CDVLocalStorage class])];
+  };
+  
+  // There seems to always be a data Cache at this moment (optionally restored from the backup), so use that
+  NSString* appLibraryFolder = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+  NSString* cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
+  self.uiWebViewLS = [cacheFolder stringByAppendingPathComponent:@"file__0.localstorage"];
+
+  // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)
+  self.wkWebViewLS = [[NSString alloc] initWithString: [appLibraryFolder stringByAppendingPathComponent:@"WebKit"]];
+  NSString* bundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+  self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:bundleIdentifier];
+  self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/file__0.localstorage"];
+  [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
   
   /*
    * This is for iOS 4.x, where you can allow inline <video> and <audio>, and also autoplay them
