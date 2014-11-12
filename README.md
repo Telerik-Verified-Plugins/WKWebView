@@ -1,5 +1,5 @@
 # Cordova WKWebView Polyfill Plugin
-by [Eddy Verbruggen](http://twitter.com/eddyverbruggen)
+by [Eddy Verbruggen](http://twitter.com/eddyverbruggen) / [Telerik](http://www.telerik.com)
 
 ## 0. Index
 
@@ -19,8 +19,14 @@ _BETA_ (a little less with v0.1.0) - things may break, [please post your feedbac
 * Will hopefully cease to exist soon (when Apple releases a fixed WKWebView so Cordova can use it without the hacks I needed to apply).
 * As a matter of fact, [Apache is working on a similar plugin (which you can't use at the moment of writing)](https://github.com/apache/cordova-plugins/tree/master/wkwebview-engine) which I came across after releasing version 0.1.1. It targets Cordova 3.7.0 and up whereas this plugin is supported on 3.0.0 an up. 
 * Your log will show some warnings but that's almost entirely down to the (otherwise excellent) embedded [CocoaHTTPServer](https://github.com/robbiehanson/CocoaHTTPServer).
+
+### TIPS
+
 * [Ionic](http://ionicframework.com/) tip: to prevent flashes of a black background, make sure you set `ion-nav-view`'s `background-color` to `transparent`.
-* Note that at the moment LocalStorage is NOT automatically transferred from the old webview to the new one.
+
+### BUGS / Caveats
+
+* Note that at the moment [LocalStorage is NOT automatically transferred from the old webview to the new one](#7). This is not an issue for new apps, but it is when you drop it into an existing one and store f.i. logins in localstorage.
 
 ## 2. Screenshot
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
@@ -38,6 +44,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.1.3__  Compatibility with [InAppBrowser](https://github.com/apache/cordova-plugin-inappbrowser)
 * __0.1.2__  Compatibility with plugins like [Toast](https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin) which add a subview to the webview (they didn't show)
 * __0.1.1__  Cleanup to get rid of a few (deprecation) warnings - lots left (on purpose) because they're thrown by a 3rd party framework and can be safely ignored
 * __0.1.0__  Added support for loading local files via XHR. This should now transparently work for $.ajax, AngularJS templateUrl's, etc. To this end the plugin adds an embedded HTTP server on port 12344 which is stopped when the app is put to sleep or exits.

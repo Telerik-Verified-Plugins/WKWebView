@@ -42,6 +42,8 @@
     <br/>
     <button onclick="document.getElementById('webglFrame').src='https://www.scirra.com/demos/c2/particles/'">load webgl iframe</button>
     <br/>
+    <button onclick="inAppBrowser()">InAppBrowser</button>
+    <br/>
     <br/>
     <a href="https://github.com/eddyverbruggen" target="_blank">Test an external link</a>
 
@@ -80,6 +82,10 @@
     }).fail(function(msg) {
       alert('fail: ' + JSON.stringify(msg));
     });
+  }
+
+  function inAppBrowser() {
+    var ref = window.open('http://google.com', '_blank', 'location=yes');
   }
 </script>
 <iframe id="webglFrame" src="" frameborder="0"></iframe>

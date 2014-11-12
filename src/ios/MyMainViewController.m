@@ -454,32 +454,16 @@
 }
 
 
-/*
-#pragma mark UIWebDelegate implementation
+#pragma mark WKNavigationDelegate implementation
 
-- (void)webViewDidFinishLoad:(UIWebView*)theWebView
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
 {
-    // Black base color for background matches the native apps
-    theWebView.backgroundColor = [UIColor blackColor];
-
-    return [super webViewDidFinishLoad:theWebView];
+  [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
 }
 
-- (void) webViewDidStartLoad:(UIWebView*)theWebView
-{
-    return [super webViewDidStartLoad:theWebView];
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+  [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
 }
-
-- (void) webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
-{
-    return [super webView:theWebView didFailLoadWithError:error];
-}
-
-- (BOOL) webView:(UIWebView*)theWebView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
-{
-    return [super webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
-}
-*/
 
 #pragma mark WKNavigationDelegate implementation
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
