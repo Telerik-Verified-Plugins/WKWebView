@@ -248,17 +248,22 @@
   // NOTE: setting these because this is largely a copy-paste of the super class, it's not actually used of course because this is the 'old' webView
   self.webView.scalesPageToFit = [enableViewportScale boolValue];
   
-  /*
-   * Fire up CDVLocalStorage to work-around WebKit storage limitations: on all iOS 5.1+ versions for local-only backups, but only needed on iOS 5.1 for cloud backup.
-   */
+  // Fire up CDVLocalStorage to work-around WebKit storage limitations: on all iOS 5.1+ versions for local-only backups, but only needed on iOS 5.1 for cloud backup.
   if (IsAtLeastiOSVersion(@"5.1") && (([backupWebStorageType isEqualToString:@"local"]) ||
                                       ([backupWebStorageType isEqualToString:@"cloud"] && !IsAtLeastiOSVersion(@"6.0")))) {
     [self registerPlugin:[[CDVLocalStorage alloc] initWithWebView:self.webView] withClassName:NSStringFromClass([CDVLocalStorage class])];
   };
-  
-  // There seems to always be a data Cache at this moment (optionally restored from the backup), so use that
+
+  // Copy UIWebView to WKWebView so upgrading to the new webview is less of a pain in the ..
   NSString* appLibraryFolder = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+  
   NSString* cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
+  BOOL isDir = YES;
+  if ([[NSFileManager defaultManager] fileExistsAtPath:cacheFolder isDirectory:&isDir]) {
+    cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
+  } else {
+    cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"WebKit/LocalStorage"];
+  }
   self.uiWebViewLS = [cacheFolder stringByAppendingPathComponent:@"file__0.localstorage"];
 
   // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)

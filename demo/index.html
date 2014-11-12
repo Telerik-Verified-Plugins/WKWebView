@@ -33,7 +33,6 @@
   <div id="deviceready" class="blink">
     <p class="event listening">Connecting to Device</p>
     <p class="event received">Device is Ready</p>
-    <button onclick="testLocalstorage()">testLocalstorage</button><br/>
     <button onclick="window.plugins.socialsharing.share('Message only', null, null, null, function(msg) {alert(msg)}, function(msg) {alert(msg)})">social sharing (needs plugin)</button>
     <br/>
     <button onclick="alert('running cordova ' + device.cordova + ' on ' + device.platform)">device test (needs plugin)</button>
@@ -43,6 +42,12 @@
     <button onclick="document.getElementById('webglFrame').src='https://www.scirra.com/demos/c2/particles/'">load webgl iframe</button>
     <br/>
     <button onclick="inAppBrowser()">InAppBrowser</button>
+    <br/>
+    <button onclick="storeInLS1()">Store val1 in LS</button>
+    <br/>
+    <button onclick="storeInLS2()">Store val2 in LS</button>
+    <br/>
+    <button onclick="readFromLS()">Read from LS</button>
     <br/>
     <br/>
     <a href="https://github.com/eddyverbruggen" target="_blank">Test an external link</a>
@@ -57,9 +62,16 @@
     alert(msg + '; ' + file + '; ' + line);
   };
 
-  function testLocalstorage() {
-    localStorage.setItem("foo", "bar");
-    alert("stored and retrieved from LS: " + localStorage.getItem("foo"));
+  function storeInLS1() {
+    localStorage.setItem("mykey1", "myval1");
+  }
+
+  function storeInLS2() {
+    localStorage.setItem("mykey2", "myval2");
+  }
+
+  function readFromLS() {
+    alert("read: " + localStorage.getItem("mykey1") + " & " + localStorage.getItem("mykey2"));
   }
 
   // reroute protocol-less GET requests to our embedded http server to defeat Origin null issues
