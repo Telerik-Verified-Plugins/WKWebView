@@ -23,6 +23,7 @@ _BETA_ (a little less with __0.1.0__) - things may break, [please post your feed
 ### TIPS
 
 * [Ionic](http://ionicframework.com/) tip: to prevent flashes of a black background, make sure you set `ion-nav-view`'s `background-color` to `transparent`.
+* If you need the [device plugin](org.apache.cordova.device), use at least Cordova-iOS 3.6.3 (deviceready never fires with 3.5.0 due to a currently unknown reason).
 
 ### BUGS / Caveats
 
