@@ -104,7 +104,7 @@
   
   // create the folder, if needed
   [[NSFileManager defaultManager] createDirectoryAtPath:newFolderPath withIntermediateDirectories:YES attributes:nil error:nil];
-    
+  
   // copy
   NSError* error = nil;
   if ((copyOK = [self copyFrom:folderPath to:newFolderPath error:&error])) {
@@ -187,9 +187,9 @@
   } else {
     // CB-3005 strip parameters from start page to check if page exists in resources
     NSURL* startURL = [NSURL URLWithString:self.startPage];
-
+    
     NSString* startFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[@"www" stringByAppendingPathComponent:[startURL path]]];
-
+    
     if (startFilePath == nil) {
       loadErr = [NSString stringWithFormat:@"ERROR: Start Page at '%@/%@' was not found.", self.wwwFolderName, self.startPage];
       NSLog(@"%@", loadErr);
@@ -227,12 +227,12 @@
   if (!self.wkWebView) {
     [self createGapView];
   }
-
+  
   [self.wkWebView loadRequest: [NSURLRequest requestWithURL:appURL]];
-
+  
   // Configure WebView
   self.wkWebView.navigationDelegate = self;
-
+  
   // register this viewcontroller with the NSURLProtocol, only after the User-Agent is set
   [CDVURLProtocol registerViewController:self];
   
@@ -244,7 +244,7 @@
   if ([self settingForKey:@"MediaPlaybackRequiresUserAction"]) {
     mediaPlaybackRequiresUserAction = [(NSNumber*)[self settingForKey:@"MediaPlaybackRequiresUserAction"] boolValue];
   }
-
+  
   // NOTE: setting these because this is largely a copy-paste of the super class, it's not actually used of course because this is the 'old' webView
   self.webView.scalesPageToFit = [enableViewportScale boolValue];
   
@@ -253,23 +253,27 @@
                                       ([backupWebStorageType isEqualToString:@"cloud"] && !IsAtLeastiOSVersion(@"6.0")))) {
     [self registerPlugin:[[CDVLocalStorage alloc] initWithWebView:self.webView] withClassName:NSStringFromClass([CDVLocalStorage class])];
   };
-
+  
   // Copy UIWebView to WKWebView so upgrading to the new webview is less of a pain in the ..
   NSString* appLibraryFolder = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-  
   NSString* cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
-  BOOL isDir = YES;
-  if ([[NSFileManager defaultManager] fileExistsAtPath:cacheFolder isDirectory:&isDir]) {
-    cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
-  } else {
+
+  if ([[NSFileManager defaultManager] fileExistsAtPath:[appLibraryFolder stringByAppendingPathComponent:@"WebKit/LocalStorage/file__0.localstorage"]]) {
     cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"WebKit/LocalStorage"];
+  } else {
+    cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
   }
   self.uiWebViewLS = [cacheFolder stringByAppendingPathComponent:@"file__0.localstorage"];
-
+  
   // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)
   self.wkWebViewLS = [[NSString alloc] initWithString: [appLibraryFolder stringByAppendingPathComponent:@"WebKit"]];
+
+#if TARGET_IPHONE_SIMULATOR
+  // the simulutor squeezes the bundle id into the path
   NSString* bundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
   self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:bundleIdentifier];
+#endif
+
   self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/file__0.localstorage"];
   [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
   
@@ -457,29 +461,29 @@
 
 - (WKWebView*)newCordovaWKWebViewWithFrame:(CGRect)bounds
 {
-    WKWebView* cordovaView = nil;
+  WKWebView* cordovaView = nil;
   
-    WKUserContentController* userContentController = [[WKUserContentController alloc] init];
-    
-    // scriptMessageHandler is the object that conforms to the WKScriptMessageHandler protocol
-    // see https://developer.apple.com/library/prerelease/ios/documentation/WebKit/Reference/WKScriptMessageHandler_Ref/index.html#//apple_ref/swift/intf/WKScriptMessageHandler
-    if ([self conformsToProtocol:@protocol(WKScriptMessageHandler)]) {
-      [userContentController addScriptMessageHandler:self name:@"cordova"];
-    }
-    
-    WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
-    // NOTE: stuff like: configuration.allowsInlineMediaPlayback = YES is set in viewDidLoad
-    configuration.userContentController = userContentController;
-    
-    cordovaView = [[WKWebView alloc] initWithFrame:bounds configuration:configuration];
-    NSLog(@"Using a WKWebView");
-    _webViewUIDelegate = [[CDVWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
-    cordovaView.UIDelegate = _webViewUIDelegate;
+  WKUserContentController* userContentController = [[WKUserContentController alloc] init];
   
-    ReroutingUIWebView *e = [[ReroutingUIWebView alloc] initWithFrame:bounds];
-    e.wkWebView = cordovaView;
-    self.webView = e;
-    return cordovaView;
+  // scriptMessageHandler is the object that conforms to the WKScriptMessageHandler protocol
+  // see https://developer.apple.com/library/prerelease/ios/documentation/WebKit/Reference/WKScriptMessageHandler_Ref/index.html#//apple_ref/swift/intf/WKScriptMessageHandler
+  if ([self conformsToProtocol:@protocol(WKScriptMessageHandler)]) {
+    [userContentController addScriptMessageHandler:self name:@"cordova"];
+  }
+  
+  WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
+  // NOTE: stuff like: configuration.allowsInlineMediaPlayback = YES is set in viewDidLoad
+  configuration.userContentController = userContentController;
+  
+  cordovaView = [[WKWebView alloc] initWithFrame:bounds configuration:configuration];
+  NSLog(@"Using a WKWebView");
+  _webViewUIDelegate = [[CDVWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
+  cordovaView.UIDelegate = _webViewUIDelegate;
+  
+  ReroutingUIWebView *e = [[ReroutingUIWebView alloc] initWithFrame:bounds];
+  e.wkWebView = cordovaView;
+  self.webView = e;
+  return cordovaView;
 }
 
 #pragma mark WKNavigationDelegate implementation
@@ -494,7 +498,7 @@
 }
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-
+  
   if (!navigationAction.targetFrame) {
     // links with target="_blank" need to open outside the app, but WKWebView doesn't allow it currently
     NSURL *url = navigationAction.request.URL;
