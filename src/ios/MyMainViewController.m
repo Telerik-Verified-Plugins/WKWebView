@@ -61,7 +61,11 @@
   
   [self.view addSubview:self.wkWebView];
   [self.view sendSubviewToBack:self.wkWebView];
-  
+
+  // plugins may do self.webView.superview which would evaluate to nil if we don't do this
+  self.webView.hidden = true;
+  [self.view addSubview:self.webView];
+  [self.view sendSubviewToBack:self.webView];
 }
 
 - (id)settingForKey:(NSString*)key

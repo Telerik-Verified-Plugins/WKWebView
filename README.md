@@ -45,6 +45,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.2.2__  Compatibility with plugins which use the superview of the 'classic' webview, like [ActivityIndicator](https://github.com/Initsogar/cordova-activityindicator)
 * __0.2.1__  LocalStorage sync between UIWebView and WKWebView - on a real device as well
 * __0.2.0__  LocalStorage sync between UIWebView and WKWebView - on a simulator only
 * __0.1.3__  Compatibility with [InAppBrowser](https://github.com/apache/cordova-plugin-inappbrowser)
