@@ -10,6 +10,11 @@
   return nil;
 }
 
+// Ionic's Keyboard Plugin 'close()' function uses this
+- (BOOL)endEditing:(BOOL)force {
+  return [self.wkWebView endEditing:force];
+}
+
 // the Toast plugin (for one) adds a subview to the webview which needs to propagate to the wkwebview
 - (void)addSubview:(UIView *)view {
   [self.wkWebView addSubview:view];
