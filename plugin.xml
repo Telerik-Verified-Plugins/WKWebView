@@ -18,6 +18,10 @@
   <!-- ios -->
   <platform name="ios">
 
+    <js-module src="www/wkwebview.js" name="wkwebview">
+        <clobbers target="wkwebview" />
+    </js-module>
+    
     <config-file target="config.xml" parent="/*">
       <feature name="WKWebViewPolyfill">
         <param name="ios-package" value="WKWebViewPolyfill"/>
