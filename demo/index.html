@@ -37,6 +37,8 @@
     <br/>
     <button onclick="alert('running cordova ' + device.cordova + ' on ' + device.platform)">device test (needs plugin)</button>
     <br/>
+    <button onclick="window.plugins.toast.showShortTop('Hello there!', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)})">Toast showShortTop</button>
+    <br/>
     <button onclick="loadXHR()">Load file via embedded HTTP server</button>
     <br/>
     <button onclick="document.getElementById('webglFrame').src='https://www.scirra.com/demos/c2/particles/'">load webgl iframe</button>
