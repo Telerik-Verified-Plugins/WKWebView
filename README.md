@@ -24,7 +24,6 @@ _BETA_ (a little less with __0.1.0__) - things may break, [please post your feed
 
 * [Ionic](http://ionicframework.com/) tip: to prevent flashes of a black background, make sure you set `ion-nav-view`'s `background-color` to `transparent`.
 * If you need the [device plugin](org.apache.cordova.device), use at least Cordova-iOS 3.6.3 (deviceready never fires with 3.5.0 due to a currently unknown reason).
-* If you're on Cordova 3.5.0 or lower and catch all errors with `window.onerror`, you may see the occasional 'script error' when a plugin sends its result back to the JS bridge. You can simply ignore these.
 
 ## 2. Screenshot
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
@@ -42,6 +41,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.2.5__  Fixed a script error for Cordova 3.5.0 and lower, see #17.
 * __0.2.4__  Compatibility with the `device` plugin on Cordova 3.5.0 and lower, see #17.
 * __0.2.3__  Compatibility with the `close` function of the [Ionic Keyboard Plugin](https://github.com/driftyco/ionic-plugins-keyboard).
 * __0.2.2__  Compatibility with plugins which use the superview of the 'classic' webview, like [ActivityIndicator](https://github.com/Initsogar/cordova-activityindicator)

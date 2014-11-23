@@ -44,7 +44,7 @@ if(!cordova.exec.jsToNativeModes.WK_WEBVIEW_BINDING) {
 			window.webkit.messageHandlers.cordova.postMessage(cmd);
 		}
 		return '';
-	}
+	};
 
 	//get ref to bridge
 	var bridge;
@@ -64,4 +64,18 @@ if(!cordova.exec.jsToNativeModes.WK_WEBVIEW_BINDING) {
 
 	//make our setter be called
 	ifr.src="";
+
+	// a seemingly silly fix for a script error observed when a plugin returns its callback
+	exec.nativeEvalAndFetch = function(func) {
+		// This shouldn't be nested, but better to be safe.
+		exec.isInContextOfEvalJs++;
+		var retVal = '';
+		try {
+			func();
+			retVal = exec.nativeFetchMessages();
+		} finally {
+			exec.isInContextOfEvalJs--;
+			return retVal;
+		}
+	};
 }
