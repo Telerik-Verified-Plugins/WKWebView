@@ -48,13 +48,12 @@
 
 #pragma mark View lifecycle
 
-- (void)createGapView
+- (void)createGapView:(WKWebViewConfiguration*) config
 {
   CGRect webViewBounds = self.view.bounds;
-  
   webViewBounds.origin = self.view.bounds.origin;
   
-  self.wkWebView = [self newCordovaWKWebViewWithFrame:webViewBounds];
+  self.wkWebView = [self newCordovaWKWebViewWithFrame:webViewBounds wkWebViewConfig:config];
   self.wkWebView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
 
   _webViewOperationsDelegate = [[CDVWebViewOperationsDelegate alloc] initWithWebView:self.webView];
@@ -225,11 +224,34 @@
   if (IsAtLeastiOSVersion(@"5.1")) {
     [CDVLocalStorage __fixupDatabaseLocationsWithBackupType:backupWebStorageType];
   }
-  
+
+  NSNumber* allowInlineMediaPlayback = [self settingForKey:@"AllowInlineMediaPlayback"];
+  BOOL mediaPlaybackRequiresUserAction = YES;  // default value
+  if ([self settingForKey:@"MediaPlaybackRequiresUserAction"]) {
+    mediaPlaybackRequiresUserAction = [(NSNumber*)[self settingForKey:@"MediaPlaybackRequiresUserAction"] boolValue];
+  }
+
   // // Instantiate the WebView ///////////////
   
   if (!self.wkWebView) {
-    [self createGapView];
+    WKUserContentController* userContentController = [[WKUserContentController alloc] init];
+    if ([self conformsToProtocol:@protocol(WKScriptMessageHandler)]) {
+      [userContentController addScriptMessageHandler:self name:@"cordova"];
+    }
+    WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
+    if ([allowInlineMediaPlayback boolValue]) {
+      config.allowsInlineMediaPlayback = YES;
+    }
+    config.mediaPlaybackRequiresUserAction = mediaPlaybackRequiresUserAction;
+    config.userContentController = userContentController;
+    BOOL suppressesIncrementalRendering = NO; // SuppressesIncrementalRendering - defaults to NO
+    if ([self settingForKey:@"SuppressesIncrementalRendering"] != nil) {
+      if ([self settingForKey:@"SuppressesIncrementalRendering"]) {
+        suppressesIncrementalRendering = [(NSNumber*)[self settingForKey:@"SuppressesIncrementalRendering"] boolValue];
+        config.suppressesIncrementalRendering = [[self settingForKey:@"SuppressesIncrementalRendering"] boolValue];
+      }
+    }
+    [self createGapView:config];
   }
   
   [self.wkWebView loadRequest: [NSURLRequest requestWithURL:appURL]];
@@ -243,11 +265,6 @@
   // /////////////////
   
   NSString* enableViewportScale = [self settingForKey:@"EnableViewportScale"];
-  NSNumber* allowInlineMediaPlayback = [self settingForKey:@"AllowInlineMediaPlayback"];
-  BOOL mediaPlaybackRequiresUserAction = YES;  // default value
-  if ([self settingForKey:@"MediaPlaybackRequiresUserAction"]) {
-    mediaPlaybackRequiresUserAction = [(NSNumber*)[self settingForKey:@"MediaPlaybackRequiresUserAction"] boolValue];
-  }
   
   // NOTE: setting these because this is largely a copy-paste of the super class, it's not actually used of course because this is the 'old' webView
   self.webView.scalesPageToFit = [enableViewportScale boolValue];
@@ -286,12 +303,9 @@
    */
   if ([allowInlineMediaPlayback boolValue] && [self.webView respondsToSelector:@selector(allowsInlineMediaPlayback)]) {
     self.webView.allowsInlineMediaPlayback = YES;
-    // piggybacking this webviewconfig to set the properties on the wkwebview as well
-    self.wkWebView.configuration.allowsInlineMediaPlayback = YES;
   }
   if ((mediaPlaybackRequiresUserAction == NO) && [self.webView respondsToSelector:@selector(mediaPlaybackRequiresUserAction)]) {
     self.webView.mediaPlaybackRequiresUserAction = NO;
-    self.wkWebView.configuration.mediaPlaybackRequiresUserAction = NO;
   }
   
   // By default, overscroll bouncing is allowed.
@@ -345,19 +359,6 @@
     // property check for compiling under iOS < 6
     if ([self.webView respondsToSelector:@selector(setKeyboardDisplayRequiresUserAction:)]) {
       [self.webView setValue:[NSNumber numberWithBool:keyboardDisplayRequiresUserAction] forKey:@"keyboardDisplayRequiresUserAction"];
-    }
-    
-    BOOL suppressesIncrementalRendering = NO; // SuppressesIncrementalRendering - defaults to NO
-    if ([self settingForKey:@"SuppressesIncrementalRendering"] != nil) {
-      if ([self settingForKey:@"SuppressesIncrementalRendering"]) {
-        suppressesIncrementalRendering = [(NSNumber*)[self settingForKey:@"SuppressesIncrementalRendering"] boolValue];
-        self.wkWebView.configuration.suppressesIncrementalRendering = [[self settingForKey:@"SuppressesIncrementalRendering"] boolValue];
-      }
-    }
-    
-    // property check for compiling under iOS < 6
-    if ([self.webView respondsToSelector:@selector(setSuppressesIncrementalRendering:)]) {
-      [self.webView setValue:[NSNumber numberWithBool:suppressesIncrementalRendering] forKey:@"suppressesIncrementalRendering"];
     }
   }
   
@@ -463,23 +464,9 @@
   }];
 }
 
-- (WKWebView*)newCordovaWKWebViewWithFrame:(CGRect)bounds
+- (WKWebView*)newCordovaWKWebViewWithFrame:(CGRect)bounds wkWebViewConfig:(WKWebViewConfiguration*) config
 {
-  WKWebView* cordovaView = nil;
-  
-  WKUserContentController* userContentController = [[WKUserContentController alloc] init];
-  
-  // scriptMessageHandler is the object that conforms to the WKScriptMessageHandler protocol
-  // see https://developer.apple.com/library/prerelease/ios/documentation/WebKit/Reference/WKScriptMessageHandler_Ref/index.html#//apple_ref/swift/intf/WKScriptMessageHandler
-  if ([self conformsToProtocol:@protocol(WKScriptMessageHandler)]) {
-    [userContentController addScriptMessageHandler:self name:@"cordova"];
-  }
-  
-  WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
-  // NOTE: stuff like: configuration.allowsInlineMediaPlayback = YES is set in viewDidLoad
-  configuration.userContentController = userContentController;
-  
-  cordovaView = [[WKWebView alloc] initWithFrame:bounds configuration:configuration];
+  WKWebView* cordovaView = [[WKWebView alloc] initWithFrame:bounds configuration:config];
   NSLog(@"Using a WKWebView");
   _webViewUIDelegate = [[CDVWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
   cordovaView.UIDelegate = _webViewUIDelegate;

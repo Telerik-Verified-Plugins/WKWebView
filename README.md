@@ -41,6 +41,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.2.6__  `Config.xml` settings like `MediaPlaybackRequiresUserAction` (autoplay HTML 5 video) are now supported, see #25.
 * __0.2.5__  Fixed a script error for Cordova 3.5.0 and lower, see #17.
 * __0.2.4__  Compatibility with the `device` plugin on Cordova 3.5.0 and lower, see #17.
 * __0.2.3__  Compatibility with the `close` function of the [Ionic Keyboard Plugin](https://github.com/driftyco/ionic-plugins-keyboard).
