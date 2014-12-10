@@ -34,13 +34,14 @@ It's a screenshot of the [demo app](demo/index.html).
 ## 3. Installation
 
 ```
-$ cordova plugin add https://github.com/EddyVerbruggen/cordova-plugin-wkwebview
+$ cordova plugin add https://github.com/Telerik-Verified-Plugins/WKWebView
 $ cordova prepare
 ```
 
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.2.7__  Cut app startup time in half - not noticable unless you have a lot of files in your app, see #32
 * __0.2.6__  `Config.xml` settings like `MediaPlaybackRequiresUserAction` (autoplay HTML 5 video) are now supported, see #25.
 * __0.2.5__  Fixed a script error for Cordova 3.5.0 and lower, see #17.
 * __0.2.4__  Compatibility with the `device` plugin on Cordova 3.5.0 and lower, see #17.

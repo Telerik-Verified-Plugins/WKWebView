@@ -9,7 +9,7 @@
 #import "ReroutingUIWebView.h"
 
 @interface CDVViewController ()
-  @property (nonatomic, readwrite, retain) NSArray *startupPluginNames;
+@property (nonatomic, readwrite, retain) NSArray *startupPluginNames;
 @end
 
 @interface MyMainViewController () {
@@ -135,20 +135,8 @@
     }
     return NO;
   }
-  
-  // generate unique filepath in temp directory
-  CFUUIDRef uuidRef = CFUUIDCreate(kCFAllocatorDefault);
-  CFStringRef uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
-  NSString* tempBackup = [[NSTemporaryDirectory() stringByAppendingPathComponent:(__bridge NSString*)uuidString] stringByAppendingPathExtension:@"bak"];
-  CFRelease(uuidString);
-  CFRelease(uuidRef);
-  
+
   BOOL destExists = [fileManager fileExistsAtPath:dest];
-  
-  // backup the dest
-  if (destExists && ![fileManager copyItemAtPath:dest toPath:tempBackup error:error]) {
-    return NO;
-  }
   
   // remove the dest
   if (destExists && ![fileManager removeItemAtPath:dest error:error]) {
@@ -161,21 +149,7 @@
   }
   
   // copy src to dest
-  if ([fileManager copyItemAtPath:src toPath:dest error:error]) {
-    // success - cleanup - delete the backup to the dest
-    if ([fileManager fileExistsAtPath:tempBackup]) {
-      [fileManager removeItemAtPath:tempBackup error:error];
-    }
-    return YES;
-  } else {
-    // failure - we restore the temp backup file to dest
-    [fileManager copyItemAtPath:tempBackup toPath:dest error:error];
-    // cleanup - delete the backup to the dest
-    if ([fileManager fileExistsAtPath:tempBackup]) {
-      [fileManager removeItemAtPath:tempBackup error:error];
-    }
-    return NO;
-  }
+  return [fileManager copyItemAtPath:src toPath:dest error:error];
 }
 
 - (void)viewDidLoad
