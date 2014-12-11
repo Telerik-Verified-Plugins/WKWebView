@@ -100,23 +100,18 @@
 
 - (void) copyBundleWWWFolderToFolder:(NSString*)folderPath
 {
-  NSString* location = nil;
-  BOOL copyOK = NO;
-  
   NSString* newFolderPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"www"];
-  
+  NSString* location = newFolderPath;
+
   // create the folder, if needed
   [[NSFileManager defaultManager] createDirectoryAtPath:newFolderPath withIntermediateDirectories:YES attributes:nil error:nil];
-  
+
   // copy
   NSError* error = nil;
-  if ((copyOK = [self copyFrom:folderPath to:newFolderPath error:&error])) {
-    location = newFolderPath;
-  }
+  BOOL copyOK = [self copyFrom:folderPath to:newFolderPath error:&error];
   NSLog(@"Copy from %@ to %@ is ok: %@", folderPath, newFolderPath, copyOK? @"YES" : @"NO");
   if (error != nil) {
     NSLog(@"%@", [error localizedDescription]);
-    location = nil;
   }
   self.wwwFolderName = location;
 }
