@@ -12,7 +12,7 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen) / [Telerik](http://www.t
 
 ## 1. Description
 
-_BETA_ (a little less with __0.1.0__) - things may break, [please post your feedback :)](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues)
+_BETA_ - things may break, [please post your feedback :)](https://github.com/EddyVerbruggen/cordova-plugin-wkwebview/issues)
 
 * Allows you to use the new WKWebView on iOS 8 (the simulator is supported as well).
 * Falls back to UIWebView on iOS 7 and lower.
@@ -41,6 +41,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.3.0__  Enhanced loading files with the embedded HTTP server, thanks #36!
 * __0.2.7__  Cut app startup time in half - not noticable unless you have a lot of files in your app, see #32
 * __0.2.6__  `Config.xml` settings like `MediaPlaybackRequiresUserAction` (autoplay HTML 5 video) are now supported, see #25.
 * __0.2.5__  Fixed a script error for Cordova 3.5.0 and lower, see #17.
