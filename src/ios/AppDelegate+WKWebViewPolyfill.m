@@ -45,10 +45,6 @@ HTTPServer *httpServer;
   // Create server using our custom MyHTTPServer class
   httpServer = [[HTTPServer alloc] init];
 
-  // just setting a fixed port for now - may change this transparantly to a dynamic value later
-  int httpPort = 12344;
-  [httpServer setPort:httpPort];
-
   // Serve files from our embedded Web folder
   NSString *webPath = myMainViewController.wwwFolderName;
   DDLogInfo(@"Setting document root: %@", webPath);
@@ -56,7 +52,9 @@ HTTPServer *httpServer;
   [httpServer setDocumentRoot:webPath];
   
   [self startServer];
-
+  
+  [myMainViewController setServerPort:[httpServer listeningPort]];
+  
   // now auto-wire any XHR calls to change their protocol to HTTP and call our embedded server
   NSMutableString *script = [[NSMutableString alloc]init];
   [script appendString:@"\
@@ -65,7 +63,7 @@ HTTPServer *httpServer;
       window.XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {\
         if (method == 'GET' && url.indexOf('://') == -1) {\
           arguments[1] = 'http://localhost:"];
-  [script appendString:[NSString stringWithFormat:@"%d", httpPort]];
+  [script appendString:[NSString stringWithFormat:@"%d", [httpServer listeningPort]]];
   [script appendString:@"/' + url;\
         }\
         return proxied.apply(this, arguments);\
@@ -87,16 +85,18 @@ HTTPServer *httpServer;
 
 - (void)startServer
 {
-  // Start the server (and check for problems)
+  // Start the server
   NSError *error;
-  if([httpServer start:&error])
-  {
-    DDLogInfo(@"Started HTTP Server on port %hu", [httpServer listeningPort]);
+  
+  // The first port we'll try to bind to is 12344 (for backwards compatibiltiy)
+  int httpPort = 12344;
+  [httpServer setPort:httpPort];
+  
+  while(![httpServer start:&error]) {
+    [httpServer setPort:(httpPort++)];
   }
-  else
-  {
-    DDLogError(@"Error starting HTTP Server: %@", error);
-  }
+  
+  DDLogInfo(@"Started HTTP Server on port %hu", [httpServer listeningPort]);
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
