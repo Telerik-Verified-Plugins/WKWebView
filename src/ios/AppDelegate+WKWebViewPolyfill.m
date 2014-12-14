@@ -36,7 +36,7 @@ HTTPServer *httpServer;
   self.window.rootViewController = myMainViewController;
   [self.window makeKeyAndVisible];
   
-  // CocoaHTTPServer stuff below, for local file loading via XHR over http:// (instead of file://)
+  // CocoaHTTPServer stuff below, for serving over http:// (instead of file://)
   
   // Configure our logging framework.
   // To keep things simple and fast, we're just going to log to the Xcode console.
@@ -55,22 +55,6 @@ HTTPServer *httpServer;
   
   [myMainViewController setServerPort:[httpServer listeningPort]];
   
-  // now auto-wire any XHR calls to change their protocol to HTTP and call our embedded server
-  NSMutableString *script = [[NSMutableString alloc]init];
-  [script appendString:@"\
-    (function() {\
-      var proxied = window.XMLHttpRequest.prototype.open;\
-      window.XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {\
-        if (method == 'GET' && url.indexOf('://') == -1) {\
-          arguments[1] = 'http://localhost:"];
-  [script appendString:[NSString stringWithFormat:@"%d", [httpServer listeningPort]]];
-  [script appendString:@"/' + url;\
-        }\
-        return proxied.apply(this, arguments);\
-      };\
-    })();"];
-  [myMainViewController.wkWebView evaluateJavaScript:script completionHandler:nil];
-
   return YES;
 }
 
