@@ -13,4 +13,9 @@
 @property (nonatomic, readwrite, copy) NSString* uiWebViewLS;
 @property (nonatomic, readwrite, copy) NSString* wkWebViewLS;
 
+@property (nonatomic, readwrite, assign) BOOL alreadyLoaded;
+
+- (void)loadURL:(NSURL*)URL;
+- (void)setServerPort:(unsigned short) port;
+
 @end

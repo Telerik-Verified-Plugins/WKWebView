@@ -16,20 +16,26 @@
   NSInteger _userAgentLockToken;
   CDVWebViewDelegate* _webViewDelegate;
   CDVWebViewUIDelegate* _webViewUIDelegate;
+  BOOL _targetExistsLocally;
 }
 @end
 
 @implementation MyMainViewController
 
+@synthesize alreadyLoaded;
+
 - (id)init
 {
   self = [super init];
   if (self) {
-    // copy all files from www to tmp to work around the WKWebView local file loading issue
+    // Save the path for our /www/ files 
     NSURL* startURL = [NSURL URLWithString:self.startPage];
     NSString* startFilePath = [self.commandDelegate pathForResource:[startURL path]];
+    _targetExistsLocally = [[NSFileManager defaultManager]
+                             fileExistsAtPath:startFilePath];
     startFilePath = [startFilePath stringByDeletingLastPathComponent];
-    [self copyBundleWWWFolderToFolder:startFilePath];
+    self.wwwFolderName = startFilePath;
+    self.alreadyLoaded = false;
   }
   
   // configure listeners which fires when the application goes away
@@ -98,24 +104,6 @@
   return [[NSURL alloc] initFileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:src]];
 }
 
-- (void) copyBundleWWWFolderToFolder:(NSString*)folderPath
-{
-  NSString* newFolderPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"www"];
-  NSString* location = newFolderPath;
-
-  // create the folder, if needed
-  [[NSFileManager defaultManager] createDirectoryAtPath:newFolderPath withIntermediateDirectories:YES attributes:nil error:nil];
-
-  // copy
-  NSError* error = nil;
-  BOOL copyOK = [self copyFrom:folderPath to:newFolderPath error:&error];
-  NSLog(@"Copy from %@ to %@ is ok: %@", folderPath, newFolderPath, copyOK? @"YES" : @"NO");
-  if (error != nil) {
-    NSLog(@"%@", [error localizedDescription]);
-  }
-  self.wwwFolderName = location;
-}
-
 - (BOOL)copyFrom:(NSString*)src to:(NSString*)dest error:(NSError* __autoreleasing*)error
 {
   NSFileManager* fileManager = [NSFileManager defaultManager];
@@ -147,6 +135,33 @@
   return [fileManager copyItemAtPath:src toPath:dest error:error];
 }
 
+- (void)loadURL:(NSURL*)URL
+{
+    self.alreadyLoaded = true;
+    // /////////////////
+    [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
+        _userAgentLockToken = lockToken;
+        [CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
+        NSURLRequest* appReq = [NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:20.0];
+            [self.wkWebView loadRequest:appReq];
+    }];
+}
+
+- (void)setServerPort:(unsigned short)port
+{
+  if(self.alreadyLoaded) {
+    // If we already loaded for some reason, we don't care about the local port.
+    return;
+  } else {
+    NSURL* startURL = [NSURL URLWithString:[NSString stringWithFormat:
+                                            @"http://localhost:%hu/%@",
+                                            port,
+                                            self.startPage]];
+    
+    [self loadURL:startURL];
+  }
+}
+
 - (void)viewDidLoad
 {
   NSURL* appURL = nil;
@@ -156,28 +171,6 @@
     appURL = [NSURL URLWithString:self.startPage];
   } else if ([self.wwwFolderName rangeOfString:@"://"].location != NSNotFound) {
     appURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", self.wwwFolderName, self.startPage]];
-  } else {
-    // CB-3005 strip parameters from start page to check if page exists in resources
-    NSURL* startURL = [NSURL URLWithString:self.startPage];
-    
-    NSString* startFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[@"www" stringByAppendingPathComponent:[startURL path]]];
-    
-    if (startFilePath == nil) {
-      loadErr = [NSString stringWithFormat:@"ERROR: Start Page at '%@/%@' was not found.", self.wwwFolderName, self.startPage];
-      NSLog(@"%@", loadErr);
-      // TODO
-      // self.loadFromString = YES;
-      appURL = nil;
-    } else {
-      appURL = [NSURL fileURLWithPath:startFilePath];
-      // CB-3005 Add on the query params or fragment.
-      NSString* startPageNoParentDirs = self.startPage;
-      NSRange r = [startPageNoParentDirs rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"?#"] options:0];
-      if (r.location != NSNotFound) {
-        NSString* queryAndOrFragment = [self.startPage substringFromIndex:r.location];
-        appURL = [NSURL URLWithString:queryAndOrFragment relativeToURL:appURL];
-      }
-    }
   }
   
   // // Fix the iOS 5.1 SECURITY_ERR bug (CB-347), this must be before the webView is instantiated ////
@@ -419,18 +412,26 @@
     
     [CDVTimer stop:@"TotalPluginStartup"];
   }
-  // /////////////////
-  [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
-    _userAgentLockToken = lockToken;
-    [CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
-    if (!loadErr) {
-      NSURLRequest* appReq = [NSURLRequest requestWithURL:appURL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:20.0];
-      [self.wkWebView loadRequest:appReq];
-    } else {
-      NSString* html = [NSString stringWithFormat:@"<html><body> %@ </body></html>", loadErr];
+  
+  if(appURL != nil) {
+    [self loadURL:appURL];
+  } else if(!_targetExistsLocally) {
+    self.alreadyLoaded = true;
+    loadErr = [NSString stringWithFormat:@"ERROR: Start Page at '%@' was not found.",
+               self.startPage];
+    NSLog(@"%@", loadErr);
+    ///////////////////
+    [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
+      _userAgentLockToken = lockToken;
+      
+      [CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
+      NSString* html = [NSString stringWithFormat:@"<html><body> %@ </body></html>",
+                        loadErr];
       [self.wkWebView loadHTMLString:html baseURL:nil];
-    }
-  }];
+    }];
+  } else {
+    // we'll load once the HTTP server starts.
+  }
 }
 
 - (WKWebView*)newCordovaWKWebViewWithFrame:(CGRect)bounds wkWebViewConfig:(WKWebViewConfiguration*) config
