@@ -239,7 +239,7 @@
   
   // Copy UIWebView to WKWebView so upgrading to the new webview is less of a pain in the ..
   NSString* appLibraryFolder = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-  NSString* cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
+  NSString* cacheFolder;
 
   if ([[NSFileManager defaultManager] fileExistsAtPath:[appLibraryFolder stringByAppendingPathComponent:@"WebKit/LocalStorage/file__0.localstorage"]]) {
     cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"WebKit/LocalStorage"];
