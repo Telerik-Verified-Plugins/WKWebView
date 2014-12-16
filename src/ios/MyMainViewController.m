@@ -451,7 +451,16 @@
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
 {
+  // It's safe to release the lock even if this is just a sub-frame that's finished loading.
   [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
+
+  // Hide the Top Activity THROBBER in the Battery Bar
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+
+  // TODO this seems like a hook into launching via a custom url scheme
+//  [self processOpenUrl];
+
+  [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPageDidLoadNotification object:self.webView]];
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
