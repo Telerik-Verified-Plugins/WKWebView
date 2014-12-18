@@ -29,7 +29,7 @@ _BETA_ - things may break, [please post your feedback :)](https://github.com/Edd
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
 It's a screenshot of the [demo app](demo/index.html).
 
-<img src="screenshots/UIWebView-vs-WKWebView.png" width="700"/>
+<img src="https://raw.githubusercontent.com/Telerik-Verified-Plugins/WKWebView/master/screenshots/UIWebView-vs-WKWebView.png" width="700"/>
 
 ## 3. Installation
 
