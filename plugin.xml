@@ -9,7 +9,15 @@
     A drop-in replacement of UIWebView for boosted performance and enhanced HTML5 support
   </description>
 
+  <author>Eddy Verbruggen / Telerik</author>
+
   <license>MIT</license>
+
+  <keywords>Webkit, Webkit webview, WKWebView, WebView+</keywords>
+
+  <repo>https://github.com/Telerik-Verified-Plugins/WKWebView.git</repo>
+
+  <issue>https://github.com/Telerik-Verified-Plugins/WKWebView/issues</issue>
 
   <engines>
     <engine name="cordova" version=">=3.0.0"/>

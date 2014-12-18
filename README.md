@@ -34,7 +34,7 @@ It's a screenshot of the [demo app](demo/index.html).
 ## 3. Installation
 
 ```
-$ cordova plugin add https://github.com/Telerik-Verified-Plugins/WKWebView
+$ cordova plugin add com.telerik.plugins.wkwebview
 $ cordova prepare
 ```
 
