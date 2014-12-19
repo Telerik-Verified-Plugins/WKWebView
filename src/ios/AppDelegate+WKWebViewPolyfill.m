@@ -21,15 +21,15 @@ NSMutableDictionary* _webServerOptions;
 }
 
 - (BOOL)my_application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
-  CGRect screenBounds = [[UIScreen mainScreen] bounds];
-  
-  self.window = [[UIWindow alloc] initWithFrame:screenBounds];
-  self.window.autoresizesSubviews = YES;
-  MyMainViewController *myMainViewController = [[MyMainViewController alloc] init];
-  self.viewController = myMainViewController;
-  self.window.rootViewController = myMainViewController;
-  [self.window makeKeyAndVisible];
-  
+    CGRect screenBounds = [[UIScreen mainScreen] bounds];
+
+    self.window = [[UIWindow alloc] initWithFrame:screenBounds];
+    self.window.autoresizesSubviews = YES;
+    MyMainViewController *myMainViewController = [[MyMainViewController alloc] init];
+    self.viewController = myMainViewController;
+    self.window.rootViewController = myMainViewController;
+    [self.window makeKeyAndVisible];
+
     // Init
     NSString *directoryPath = myMainViewController.wwwFolderName;
     _webServer = [[GCDWebServer alloc] init];
@@ -43,47 +43,47 @@ NSMutableDictionary* _webServerOptions;
                       allowRangeRequests:YES];
 
     // Start
-  [self startServer];
-  
+    [self startServer];
+    
     // Set Port
     [myMainViewController setServerPort:_webServer.port];
-  
-  return YES;
+
+    return YES;
 }
 
 - (BOOL)identity_application: (UIApplication *)application
                      openURL: (NSURL *)url
            sourceApplication: (NSString *)sourceApplication
                   annotation: (id)annotation {
-  
-  // call super
-  return [self identity_application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+
+    // call super
+    return [self identity_application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
 
 - (void)startServer
 {
-  // Start the server
+    // Start the server
     NSError *error = nil;
-  
-  // The first port we'll try to bind to is 12344 (for backwards compatibiltiy)
-  
+
+    // The first port we'll try to bind to is 12344 (for backwards compatibiltiy)
+
     [_webServerOptions setValue:@"CDVWidget" forKey:GCDWebServerOption_BonjourName];
     [_webServerOptions setValue:@"CDVWidget" forKey:GCDWebServerOption_ServerName];
     [_webServerOptions setObject:[NSNumber numberWithBool:NO] forKey:GCDWebServerOption_AutomaticallySuspendInBackground];
-  
+
     int httpPort = 12344;
     [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort] forKey:GCDWebServerOption_Port];
 
     while(![_webServer startWithOptions:_webServerOptions error:&error]) {
         [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort++] forKey:GCDWebServerOption_Port];
-}
+    }
 
     if (error) {
         NSLog(@"Error starting http daemon: %@", error);
     } else {
         NSLog(@"Started http daemon: %@ ", _webServer.serverURL);
     }
-  
+
     NSLog(@"Started http daemon: %@ ", _webServer.serverURL);
 }
 
@@ -93,13 +93,13 @@ NSMutableDictionary* _webServerOptions;
 #pragma mark Swizzling
 
 static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelector) {
-  Method destinationMethod = class_getInstanceMethod(class, destinationSelector);
-  Method sourceMethod = class_getInstanceMethod(class, sourceSelector);
-  
-  // If the method doesn't exist, add it.  If it does exist, replace it with the given implementation.
-  if (class_addMethod(class, destinationSelector, method_getImplementation(sourceMethod), method_getTypeEncoding(sourceMethod))) {
-    class_replaceMethod(class, destinationSelector, method_getImplementation(destinationMethod), method_getTypeEncoding(destinationMethod));
-  } else {
-    method_exchangeImplementations(destinationMethod, sourceMethod);
-  }
+    Method destinationMethod = class_getInstanceMethod(class, destinationSelector);
+    Method sourceMethod = class_getInstanceMethod(class, sourceSelector);
+
+    // If the method doesn't exist, add it.  If it does exist, replace it with the given implementation.
+    if (class_addMethod(class, destinationSelector, method_getImplementation(sourceMethod), method_getTypeEncoding(sourceMethod))) {
+        class_replaceMethod(class, destinationSelector, method_getImplementation(destinationMethod), method_getTypeEncoding(destinationMethod));
+    } else {
+        method_exchangeImplementations(destinationMethod, sourceMethod);
+    }
 }
