@@ -38,9 +38,10 @@
 
     <!-- For WKWebView -->
     <framework src="WebKit.framework" />
-    <!-- For CocoaHTTPServer -->
-    <framework src="CFNetwork.framework" />
-    <framework src="Security.framework" />
+
+    <!-- GCDWebServer -->
+    <framework src="libz.dylib" />
+    <framework src="src/ios/GCDWebServer.framework" custom="true"/>
 
     <!-- the controller loading the WKWebView -->
     <header-file src="src/ios/MyMainViewController.h"/>
