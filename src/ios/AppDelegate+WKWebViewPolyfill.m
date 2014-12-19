@@ -1,29 +1,23 @@
 #import <objc/runtime.h>
 #import "AppDelegate.h"
 #import "MyMainViewController.h"
-
-#import "HTTPServer.h"
-#import "DDLog.h"
-#import "DDTTYLogger.h"
-
-// Log levels for the embedded HTTP server: off, error, warn, info, verbose
-static const int ddLogLevel = LOG_LEVEL_VERBOSE;
+#import <GCDWebServer/GCDWebServer.h>
 
 // need to swap out a method, so swizzling it here
 static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelector);
 
-@class HTTPServer;
-HTTPServer *httpServer;
-
 @implementation AppDelegate (WKWebViewPolyfill)
 
+GCDWebServer* _webServer;
+NSMutableDictionary* _webServerOptions;
+
 + (void)load {
-  // swap in our own viewcontroller which loads the wkwebview, but only in case we're running iOS 8+
-  if (IsAtLeastiOSVersion(@"8.0")) {
-    swizzleMethod([AppDelegate class],
-                  @selector(application:didFinishLaunchingWithOptions:),
-                  @selector(my_application:didFinishLaunchingWithOptions:));
-  }
+    // swap in our own viewcontroller which loads the wkwebview, but only in case we're running iOS 8+
+    if (IsAtLeastiOSVersion(@"8.0")) {
+        swizzleMethod([AppDelegate class],
+                      @selector(application:didFinishLaunchingWithOptions:),
+                      @selector(my_application:didFinishLaunchingWithOptions:));
+    }
 }
 
 - (BOOL)my_application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
@@ -36,24 +30,23 @@ HTTPServer *httpServer;
   self.window.rootViewController = myMainViewController;
   [self.window makeKeyAndVisible];
   
-  // CocoaHTTPServer stuff below, for serving over http:// (instead of file://)
-  
-  // Configure our logging framework.
-  // To keep things simple and fast, we're just going to log to the Xcode console.
-  [DDLog addLogger:[DDTTYLogger sharedInstance]];
-  
-  // Create server using our custom MyHTTPServer class
-  httpServer = [[HTTPServer alloc] init];
+    // Init
+    NSString *directoryPath = myMainViewController.wwwFolderName;
+    _webServer = [[GCDWebServer alloc] init];
+    _webServerOptions = [NSMutableDictionary dictionary];
 
-  // Serve files from our embedded Web folder
-  NSString *webPath = myMainViewController.wwwFolderName;
-  DDLogInfo(@"Setting document root: %@", webPath);
-  
-  [httpServer setDocumentRoot:webPath];
-  
+    // Serve whole local directory
+    [_webServer addGETHandlerForBasePath:@"/"
+                           directoryPath:directoryPath
+                           indexFilename:nil
+                                cacheAge:60
+                      allowRangeRequests:YES];
+
+    // Start
   [self startServer];
   
-  [myMainViewController setServerPort:[httpServer listeningPort]];
+    // Set Port
+    [myMainViewController setServerPort:_webServer.port];
   
   return YES;
 }
@@ -70,33 +63,28 @@ HTTPServer *httpServer;
 - (void)startServer
 {
   // Start the server
-  NSError *error;
+    NSError *error = nil;
   
   // The first port we'll try to bind to is 12344 (for backwards compatibiltiy)
-  int httpPort = 12344;
-  [httpServer setPort:httpPort];
   
-  while(![httpServer start:&error]) {
-    [httpServer setPort:(httpPort++)];
-  }
+    [_webServerOptions setValue:@"CDVWidget" forKey:GCDWebServerOption_BonjourName];
+    [_webServerOptions setValue:@"CDVWidget" forKey:GCDWebServerOption_ServerName];
+    [_webServerOptions setObject:[NSNumber numberWithBool:NO] forKey:GCDWebServerOption_AutomaticallySuspendInBackground];
   
-  DDLogInfo(@"Started HTTP Server on port %hu", [httpServer listeningPort]);
+    int httpPort = 12344;
+    [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort] forKey:GCDWebServerOption_Port];
+
+    while(![_webServer startWithOptions:_webServerOptions error:&error]) {
+        [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort++] forKey:GCDWebServerOption_Port];
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
-  [self startServer];
-  DDLogInfo(@"Restarted HTTP Server on port %hu", [httpServer listeningPort]);
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-  // There is no public(allowed in AppStore) method for iOS to run continiously in the background for our purposes (serving HTTP).
-  // So, we stop the server when the app is paused (if a users exits from the app or locks a device) and
-  // restart the server when the app is resumed (based on this document: http://developer.apple.com/library/ios/#technotes/tn2277/_index.html )
+    if (error) {
+        NSLog(@"Error starting http daemon: %@", error);
+    } else {
+        NSLog(@"Started http daemon: %@ ", _webServer.serverURL);
+    }
   
-  DDLogInfo(@"Stopped HTTP Server on port %hu", [httpServer listeningPort]);
-  [httpServer stop];
+    NSLog(@"Started http daemon: %@ ", _webServer.serverURL);
 }
 
 @end
