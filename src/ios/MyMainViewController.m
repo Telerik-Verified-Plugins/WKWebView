@@ -210,9 +210,9 @@
     if ([self settingForKey:@"SuppressesIncrementalRendering"] != nil) {
       if ([self settingForKey:@"SuppressesIncrementalRendering"]) {
         suppressesIncrementalRendering = [(NSNumber*)[self settingForKey:@"SuppressesIncrementalRendering"] boolValue];
-        config.suppressesIncrementalRendering = [[self settingForKey:@"SuppressesIncrementalRendering"] boolValue];
       }
     }
+    config.suppressesIncrementalRendering = suppressesIncrementalRendering;
     [self createGapView:config];
   }
   
