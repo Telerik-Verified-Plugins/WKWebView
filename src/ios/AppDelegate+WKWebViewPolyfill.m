@@ -65,18 +65,16 @@ NSMutableDictionary* _webServerOptions;
     // Start the server
     NSError *error = nil;
 
-    // The first port we'll try to bind to is 12344 (for backwards compatibiltiy)
-
     [_webServerOptions setValue:@"CDVWidget" forKey:GCDWebServerOption_BonjourName];
     [_webServerOptions setValue:@"CDVWidget" forKey:GCDWebServerOption_ServerName];
     [_webServerOptions setObject:[NSNumber numberWithBool:NO] forKey:GCDWebServerOption_AutomaticallySuspendInBackground];
 
+    // The first port we'll try to bind to is 12344 (for backwards compatibiltiy)
     int httpPort = 12344;
-    [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort] forKey:GCDWebServerOption_Port];
-
-    while(![_webServer startWithOptions:_webServerOptions error:&error]) {
-        [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort++] forKey:GCDWebServerOption_Port];
-    }
+    do {
+        [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort++]
+                              forKey:GCDWebServerOption_Port];
+    } while(![_webServer startWithOptions:_webServerOptions error:&error]);
 
     if (error) {
         NSLog(@"Error starting http daemon: %@", error);
