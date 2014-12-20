@@ -41,6 +41,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.3.2__  Switched embedded HTTP server from CocoaHTTP server to GCDWebServer, thanks #43!
 * __0.3.1__  Compatibility with the SplashScreen plugin
 * __0.3.0__  Enhanced loading files with the embedded HTTP server, thanks #36!
 * __0.2.7__  Cut app startup time in half - not noticable unless you have a lot of files in your app, see #32
