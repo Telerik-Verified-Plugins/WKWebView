@@ -12,7 +12,7 @@ GCDWebServer* _webServer;
 NSMutableDictionary* _webServerOptions;
 
 + (void)load {
-    // swap in our own viewcontroller which loads the wkwebview, but only in case we're running iOS 8+
+    // Swap in our own viewcontroller which loads the wkwebview, but only in case we're running iOS 8+
     if (IsAtLeastiOSVersion(@"8.0")) {
         swizzleMethod([AppDelegate class],
                       @selector(application:didFinishLaunchingWithOptions:),
@@ -30,22 +30,23 @@ NSMutableDictionary* _webServerOptions;
     self.window.rootViewController = myMainViewController;
     [self.window makeKeyAndVisible];
 
-    // Init
+    // Initialize Server environment variables
     NSString *directoryPath = myMainViewController.wwwFolderName;
     _webServer = [[GCDWebServer alloc] init];
     _webServerOptions = [NSMutableDictionary dictionary];
 
-    // Serve whole local directory
+    // Add GET handler for local "www/" directory
+    // TODO: Add handlers for persistent document folder
     [_webServer addGETHandlerForBasePath:@"/"
                            directoryPath:directoryPath
                            indexFilename:nil
                                 cacheAge:60
                       allowRangeRequests:YES];
 
-    // Start
+    // Initialize Server startup
     [self startServer];
     
-    // Set Port
+    // Update Swizzled ViewController with port currently used by local Server
     [myMainViewController setServerPort:_webServer.port];
 
     return YES;
@@ -62,15 +63,14 @@ NSMutableDictionary* _webServerOptions;
 
 - (void)startServer
 {
-    // Start the server
     NSError *error = nil;
 
-    [_webServerOptions setValue:@"CDVWidget" forKey:GCDWebServerOption_BonjourName];
-    [_webServerOptions setValue:@"CDVWidget" forKey:GCDWebServerOption_ServerName];
     [_webServerOptions setObject:[NSNumber numberWithBool:NO] forKey:GCDWebServerOption_AutomaticallySuspendInBackground];
 
-    // The first port we'll try to bind to is 12344 (for backwards compatibiltiy)
+    // Initialize Server listening port, initially trying 12344 for backwards compatibility
     int httpPort = 12344;
+
+    // Start Server
     do {
         [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort++]
                               forKey:GCDWebServerOption_Port];
@@ -81,8 +81,6 @@ NSMutableDictionary* _webServerOptions;
     } else {
         NSLog(@"Started http daemon: %@ ", _webServer.serverURL);
     }
-
-    NSLog(@"Started http daemon: %@ ", _webServer.serverURL);
 }
 
 @end
