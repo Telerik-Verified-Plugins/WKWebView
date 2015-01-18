@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="com.telerik.plugins.wkwebview"
-        version="0.3.4">
+        version="0.3.5">
 
   <name>WKWebView Polyfill</name>
 
@@ -13,7 +13,7 @@
 
   <license>MIT</license>
 
-  <keywords>Webkit, Webkit webview, WKWebView, WebView+</keywords>
+  <keywords>Webkit, Webkit webview, WKWebView Polyfill, WKWebView, WebView+</keywords>
 
   <repo>https://github.com/Telerik-Verified-Plugins/WKWebView.git</repo>
 
@@ -57,8 +57,6 @@
     <source-file src="src/ios/CDVWebViewOperationsDelegate.m"/>
     <header-file src="src/ios/CDVWebViewUIDelegate.h"/>
     <source-file src="src/ios/CDVWebViewUIDelegate.m"/>
-
-
 
   </platform>
 

@@ -409,6 +409,9 @@
       [self getCommandInstance:pluginName];
       [CDVTimer stop:pluginName];
     }
+    // Correct the frame, as plugins like statusbar may alter it.
+    // No need to check for pluginname like 'statusbar' because others may alter it too.
+    self.wkWebView.frame = self.webView.frame;
     
     [CDVTimer stop:@"TotalPluginStartup"];
   }
