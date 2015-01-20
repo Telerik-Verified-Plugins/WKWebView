@@ -48,6 +48,7 @@
     <source-file src="src/ios/MyMainViewController.m"/>
 
     <!-- the class which swaps in our controller and offers helper methods for the JS API -->
+    <source-file src="src/ios/AppDelegate+WKWebViewPolyfill.h"/>
     <source-file src="src/ios/AppDelegate+WKWebViewPolyfill.m"/>
 
     <!-- helper classes -->

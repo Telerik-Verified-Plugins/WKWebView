@@ -21,6 +21,11 @@ NSMutableDictionary* _webServerOptions;
 }
 
 - (BOOL)my_application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
+    [self createWindowAndStartWebServer:true];
+    return YES;
+}
+
+- (void) createWindowAndStartWebServer:(BOOL) startWebServer {
     CGRect screenBounds = [[UIScreen mainScreen] bounds];
 
     self.window = [[UIWindow alloc] initWithFrame:screenBounds];
@@ -44,12 +49,12 @@ NSMutableDictionary* _webServerOptions;
                       allowRangeRequests:YES];
 
     // Initialize Server startup
-    [self startServer];
+    if (startWebServer) {
+        [self startServer];
+    }
     
     // Update Swizzled ViewController with port currently used by local Server
     [myMainViewController setServerPort:_webServer.port];
-
-    return YES;
 }
 
 - (BOOL)identity_application: (UIApplication *)application
