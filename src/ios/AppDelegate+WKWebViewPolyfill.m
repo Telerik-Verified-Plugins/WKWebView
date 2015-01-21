@@ -68,6 +68,9 @@ NSMutableDictionary* _webServerOptions;
     // Enable this option to force the Server also to run when suspended
     //[_webServerOptions setObject:[NSNumber numberWithBool:NO] forKey:GCDWebServerOption_AutomaticallySuspendInBackground];
 
+    [_webServerOptions setObject:[NSNumber numberWithBool:YES]
+                          forKey:GCDWebServerOption_BindToLocalhost];
+
     // Initialize Server listening port, initially trying 12344 for backwards compatibility
     int httpPort = 12344;
 
