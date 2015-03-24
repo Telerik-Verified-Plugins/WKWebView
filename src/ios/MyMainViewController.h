@@ -13,6 +13,8 @@
 @property (nonatomic, readwrite, copy) NSString* uiWebViewLS;
 @property (nonatomic, readwrite, copy) NSString* wkWebViewLS;
 
+@property (nonatomic, readwrite, copy) NSString* cacheFolderName;
+
 @property (nonatomic, readwrite, assign) BOOL alreadyLoaded;
 
 - (void)loadURL:(NSURL*)URL;

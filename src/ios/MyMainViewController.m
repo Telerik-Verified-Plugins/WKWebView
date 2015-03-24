@@ -28,16 +28,24 @@
 {
   self = [super init];
   if (self) {
-    // Save the path for our /www/ files 
+    // Save the path for our /www/ files
     NSURL* startURL = [NSURL URLWithString:self.startPage];
     NSString* startFilePath = [self.commandDelegate pathForResource:[startURL path]];
     _targetExistsLocally = [[NSFileManager defaultManager]
                              fileExistsAtPath:startFilePath];
     startFilePath = [startFilePath stringByDeletingLastPathComponent];
+
+    // Save the path for the app sandbox files
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString* cacheFilePath = [paths objectAtIndex:0]; // Get documents folder
+    cacheFilePath = [cacheFilePath stringByDeletingLastPathComponent];
+
     self.wwwFolderName = startFilePath;
+    self.cacheFolderName = cacheFilePath;
+
     self.alreadyLoaded = false;
   }
-  
+
   // configure listeners which fires when the application goes away
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(copyLocalStorageToUIWebView:)
                                                name:UIApplicationWillTerminateNotification object:nil];
@@ -58,12 +66,12 @@
 {
   CGRect webViewBounds = self.view.bounds;
   webViewBounds.origin = self.view.bounds.origin;
-  
+
   self.wkWebView = [self newCordovaWKWebViewWithFrame:webViewBounds wkWebViewConfig:config];
   self.wkWebView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
 
   _webViewOperationsDelegate = [[CDVWebViewOperationsDelegate alloc] initWithWebView:self.webView];
-  
+
   [self.view addSubview:self.wkWebView];
   [self.view sendSubviewToBack:self.wkWebView];
 
@@ -94,7 +102,7 @@
       NSLog(@"Error deleting file: %@", [copyError localizedDescription]);
     }
   }
-  
+
   // Copy to tmp
   if (![[NSFileManager defaultManager] copyItemAtPath:fullPath toPath:[NSTemporaryDirectory() stringByAppendingPathComponent:src] error:&copyError]) {
     NSLog(@"Error copying file: %@", [copyError localizedDescription]);
@@ -107,7 +115,7 @@
 - (BOOL)copyFrom:(NSString*)src to:(NSString*)dest error:(NSError* __autoreleasing*)error
 {
   NSFileManager* fileManager = [NSFileManager defaultManager];
-  
+
   if (![fileManager fileExistsAtPath:src]) {
     NSString* errorString = [NSString stringWithFormat:@"%@ file does not exist.", src];
     if (error != NULL) {
@@ -120,17 +128,17 @@
   }
 
   BOOL destExists = [fileManager fileExistsAtPath:dest];
-  
+
   // remove the dest
   if (destExists && ![fileManager removeItemAtPath:dest error:error]) {
     return NO;
   }
-  
+
   // create path to dest
   if (!destExists && ![fileManager createDirectoryAtPath:[dest stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:error]) {
     return NO;
   }
-  
+
   // copy src to dest
   return [fileManager copyItemAtPath:src toPath:dest error:error];
 }
@@ -157,7 +165,7 @@
                                             @"http://localhost:%hu/%@",
                                             port,
                                             self.startPage]];
-    
+
     [self loadURL:startURL];
   }
 }
@@ -166,23 +174,23 @@
 {
   NSURL* appURL = nil;
   NSString* loadErr = nil;
-  
+
   if ([self.startPage rangeOfString:@"://"].location != NSNotFound) {
     appURL = [NSURL URLWithString:self.startPage];
   } else if ([self.wwwFolderName rangeOfString:@"://"].location != NSNotFound) {
     appURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", self.wwwFolderName, self.startPage]];
   }
-  
+
   // // Fix the iOS 5.1 SECURITY_ERR bug (CB-347), this must be before the webView is instantiated ////
-  
+
   NSString* backupWebStorageType = @"cloud"; // default value
-  
+
   id backupWebStorage = [self settingForKey:@"BackupWebStorage"];
   if ([backupWebStorage isKindOfClass:[NSString class]]) {
     backupWebStorageType = backupWebStorage;
   }
   [self setSetting:backupWebStorageType forKey:@"BackupWebStorage"];
-  
+
   if (IsAtLeastiOSVersion(@"5.1")) {
     [CDVLocalStorage __fixupDatabaseLocationsWithBackupType:backupWebStorageType];
   }
@@ -194,7 +202,7 @@
   }
 
   // // Instantiate the WebView ///////////////
-  
+
   if (!self.wkWebView) {
     WKUserContentController* userContentController = [[WKUserContentController alloc] init];
     if ([self conformsToProtocol:@protocol(WKScriptMessageHandler)]) {
@@ -215,28 +223,28 @@
     config.suppressesIncrementalRendering = suppressesIncrementalRendering;
     [self createGapView:config];
   }
-  
+
   [self.wkWebView loadRequest: [NSURLRequest requestWithURL:appURL]];
-  
+
   // Configure WebView
   self.wkWebView.navigationDelegate = self;
-  
+
   // register this viewcontroller with the NSURLProtocol, only after the User-Agent is set
   [CDVURLProtocol registerViewController:self];
-  
+
   // /////////////////
-  
+
   NSString* enableViewportScale = [self settingForKey:@"EnableViewportScale"];
-  
+
   // NOTE: setting these because this is largely a copy-paste of the super class, it's not actually used of course because this is the 'old' webView
   self.webView.scalesPageToFit = [enableViewportScale boolValue];
-  
+
   // Fire up CDVLocalStorage to work-around WebKit storage limitations: on all iOS 5.1+ versions for local-only backups, but only needed on iOS 5.1 for cloud backup.
   if (IsAtLeastiOSVersion(@"5.1") && (([backupWebStorageType isEqualToString:@"local"]) ||
                                       ([backupWebStorageType isEqualToString:@"cloud"] && !IsAtLeastiOSVersion(@"6.0")))) {
     [self registerPlugin:[[CDVLocalStorage alloc] initWithWebView:self.webView] withClassName:NSStringFromClass([CDVLocalStorage class])];
   };
-  
+
   // Copy UIWebView to WKWebView so upgrading to the new webview is less of a pain in the ..
   NSString* appLibraryFolder = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
   NSString* cacheFolder;
@@ -247,7 +255,7 @@
     cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
   }
   self.uiWebViewLS = [cacheFolder stringByAppendingPathComponent:@"file__0.localstorage"];
-  
+
   // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)
   self.wkWebViewLS = [[NSString alloc] initWithString: [appLibraryFolder stringByAppendingPathComponent:@"WebKit"]];
 
@@ -259,7 +267,7 @@
 
   self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/file__0.localstorage"];
   [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
-  
+
   /*
    * This is for iOS 4.x, where you can allow inline <video> and <audio>, and also autoplay them
    */
@@ -269,7 +277,7 @@
   if ((mediaPlaybackRequiresUserAction == NO) && [self.webView respondsToSelector:@selector(mediaPlaybackRequiresUserAction)]) {
     self.webView.mediaPlaybackRequiresUserAction = NO;
   }
-  
+
   // By default, overscroll bouncing is allowed.
   // UIWebViewBounce has been renamed to DisallowOverscroll, but both are checked.
   BOOL bounceAllowed = YES;
@@ -280,7 +288,7 @@
   } else {
     bounceAllowed = ![disallowOverscroll boolValue];
   }
-  
+
   // prevent webView from bouncing
   // based on the DisallowOverscroll/UIWebViewBounce key in config.xml
   if (!bounceAllowed) {
@@ -300,13 +308,13 @@
       }
     }
   }
-  
+
   NSString* decelerationSetting = [self settingForKey:@"UIWebViewDecelerationSpeed"];
   if (![@"fast" isEqualToString : decelerationSetting]) {
     [self.webView.scrollView setDecelerationRate:UIScrollViewDecelerationRateNormal];
     [self.wkWebView.scrollView setDecelerationRate:UIScrollViewDecelerationRateNormal];
   }
-  
+
   /*
    * iOS 6.0 UIWebView properties
    */
@@ -317,93 +325,93 @@
         keyboardDisplayRequiresUserAction = [(NSNumber*)[self settingForKey:@"KeyboardDisplayRequiresUserAction"] boolValue];
       }
     }
-    
+
     // property check for compiling under iOS < 6
     if ([self.webView respondsToSelector:@selector(setKeyboardDisplayRequiresUserAction:)]) {
       [self.webView setValue:[NSNumber numberWithBool:keyboardDisplayRequiresUserAction] forKey:@"keyboardDisplayRequiresUserAction"];
     }
   }
-  
+
   /*
    * iOS 7.0 UIWebView properties
    */
   if (IsAtLeastiOSVersion(@"7.0")) {
     SEL ios7sel = nil;
     id prefObj = nil;
-    
+
     CGFloat gapBetweenPages = 0.0; // default
     prefObj = [self settingForKey:@"GapBetweenPages"];
     if (prefObj != nil) {
       gapBetweenPages = [prefObj floatValue];
     }
-    
+
     // property check for compiling under iOS < 7
     ios7sel = NSSelectorFromString(@"setGapBetweenPages:");
     if ([self.webView respondsToSelector:ios7sel]) {
       [self.webView setValue:[NSNumber numberWithFloat:gapBetweenPages] forKey:@"gapBetweenPages"];
     }
-    
+
     CGFloat pageLength = 0.0; // default
     prefObj = [self settingForKey:@"PageLength"];
     if (prefObj != nil) {
       pageLength = [[self settingForKey:@"PageLength"] floatValue];
     }
-    
+
     // property check for compiling under iOS < 7
     ios7sel = NSSelectorFromString(@"setPageLength:");
     if ([self.webView respondsToSelector:ios7sel]) {
       [self.webView setValue:[NSNumber numberWithBool:pageLength] forKey:@"pageLength"];
     }
-    
+
     NSInteger paginationBreakingMode = 0; // default - UIWebPaginationBreakingModePage
     prefObj = [self settingForKey:@"PaginationBreakingMode"];
     if (prefObj != nil) {
       NSArray* validValues = @[@"page", @"column"];
       NSString* prefValue = [validValues objectAtIndex:0];
-      
+
       if ([prefObj isKindOfClass:[NSString class]]) {
         prefValue = prefObj;
       }
-      
+
       paginationBreakingMode = [validValues indexOfObject:[prefValue lowercaseString]];
       if (paginationBreakingMode == NSNotFound) {
         paginationBreakingMode = 0;
       }
     }
-    
+
     // property check for compiling under iOS < 7
     ios7sel = NSSelectorFromString(@"setPaginationBreakingMode:");
     if ([self.webView respondsToSelector:ios7sel]) {
       [self.webView setValue:[NSNumber numberWithInteger:paginationBreakingMode] forKey:@"paginationBreakingMode"];
     }
-    
+
     NSInteger paginationMode = 0; // default - UIWebPaginationModeUnpaginated
     prefObj = [self settingForKey:@"PaginationMode"];
     if (prefObj != nil) {
       NSArray* validValues = @[@"unpaginated", @"lefttoright", @"toptobottom", @"bottomtotop", @"righttoleft"];
       NSString* prefValue = [validValues objectAtIndex:0];
-      
+
       if ([prefObj isKindOfClass:[NSString class]]) {
         prefValue = prefObj;
       }
-      
+
       paginationMode = [validValues indexOfObject:[prefValue lowercaseString]];
       if (paginationMode == NSNotFound) {
         paginationMode = 0;
       }
     }
-    
+
     // property check for compiling under iOS < 7
     ios7sel = NSSelectorFromString(@"setPaginationMode:");
     if ([self.webView respondsToSelector:ios7sel]) {
       [self.webView setValue:[NSNumber numberWithInteger:paginationMode] forKey:@"paginationMode"];
     }
   }
-  
+
   // init startup plugins
   if ([self.startupPluginNames count] > 0) {
     [CDVTimer start:@"TotalPluginStartup"];
-    
+
     for (NSString* pluginName in self.startupPluginNames) {
       [CDVTimer start:pluginName];
       [self getCommandInstance:pluginName];
@@ -412,10 +420,10 @@
     // Correct the frame, as plugins like statusbar may alter it.
     // No need to check for pluginname like 'statusbar' because others may alter it too.
     self.wkWebView.frame = self.webView.frame;
-    
+
     [CDVTimer stop:@"TotalPluginStartup"];
   }
-  
+
   if(appURL != nil) {
     [self loadURL:appURL];
   } else if(!_targetExistsLocally) {
@@ -426,7 +434,7 @@
     ///////////////////
     [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
       _userAgentLockToken = lockToken;
-      
+
       [CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
       NSString* html = [NSString stringWithFormat:@"<html><body> %@ </body></html>",
                         loadErr];
@@ -443,7 +451,7 @@
   NSLog(@"Using a WKWebView");
   _webViewUIDelegate = [[CDVWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
   cordovaView.UIDelegate = _webViewUIDelegate;
-  
+
   ReroutingUIWebView *e = [[ReroutingUIWebView alloc] initWithFrame:bounds];
   e.wkWebView = cordovaView;
   self.webView = e;
@@ -471,7 +479,7 @@
 }
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-  
+
   if (!navigationAction.targetFrame) {
     // links with target="_blank" need to open outside the app, but WKWebView doesn't allow it currently
     NSURL *url = navigationAction.request.URL;
@@ -492,7 +500,7 @@
   if (![message.name isEqualToString:@"cordova"]) {
     return;
   }
-  
+
   NSArray* jsonEntry = message.body; // NSString:callbackId, NSString:service, NSString:action, NSArray:args
   CDVInvokedUrlCommand* command = [CDVInvokedUrlCommand commandFromJson:jsonEntry];
   CDV_EXEC_LOG(@"Exec(%@): Calling %@.%@", command.callbackId, command.className, command.methodName);
