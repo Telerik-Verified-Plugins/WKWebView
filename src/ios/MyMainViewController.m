@@ -132,7 +132,7 @@
             [_crashRecoveryTimer invalidate];
             _crashRecoveryTimer = nil;
             AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-            [appDelegate createWindowAndStartWebServer:false];
+            [appDelegate createWindowAndStartWebServer:true];
         }
     } else {
 
