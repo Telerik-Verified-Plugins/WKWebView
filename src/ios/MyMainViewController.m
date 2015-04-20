@@ -7,6 +7,7 @@
 #import <Cordova/CDVURLProtocol.h>
 #import "CDVWebViewUIDelegate.h"
 #import "ReroutingUIWebView.h"
+#import "AppDelegate+WKWebViewPolyfill.h"
 
 @interface CDVViewController ()
 @property (nonatomic, readwrite, retain) NSArray *startupPluginNames;
@@ -17,6 +18,8 @@
   CDVWebViewDelegate* _webViewDelegate;
   CDVWebViewUIDelegate* _webViewUIDelegate;
   BOOL _targetExistsLocally;
+  NSTimer* _crashRecoveryTimer;
+  BOOL _crashRecoveryActive;
 }
 @end
 
@@ -135,6 +138,26 @@
   }
 }
  */
+
+- (void)recoverFromCrash
+{
+    // When an empty title is returned, WkWebView has crashed
+    NSString* title = self.wkWebView.title;
+    if ((title == nil) || [title isEqualToString:@""]) {
+        if (_crashRecoveryActive) {
+            NSLog(@"WkWebView crash detected, recovering... ");
+            _crashRecoveryActive = false;
+            [_crashRecoveryTimer invalidate];
+            _crashRecoveryTimer = nil;
+            AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+            [appDelegate createWindowAndStartWebServer:false];
+        }
+    } else {
+        
+        // Once the title has been reported back as valid, activate crash recovery
+        _crashRecoveryActive = true;
+    }
+}
 
 - (id)settingForKey:(NSString*)key
 {
@@ -497,6 +520,11 @@
     }];
   } else {
     // we'll load once the HTTP server starts.
+  }
+
+  // Start timer which periodically checks whether the app is alive
+  if ([self settingForKey:@"RecoverFromCrash"] && [[self settingForKey:@"RecoverFromCrash"] boolValue]) {
+    _crashRecoveryTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(recoverFromCrash) userInfo:nil repeats:YES];
   }
 }
 
