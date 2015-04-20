@@ -43,7 +43,53 @@
                                                name:UIApplicationWillTerminateNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(copyLocalStorageToUIWebView:)
                                                name:UIApplicationWillResignActiveNotification object:nil];
+
+  
+  // and some more for custom url schemes
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationLaunchedWithUrl:) name:CDVPluginHandleOpenURLNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationPageDidLoad:) name:CDVPageDidLoadNotification object:nil];
+
   return self;
+}
+
+- (void)applicationLaunchedWithUrl:(NSNotification*)notification {
+  NSURL *url = [notification object];
+  self.url = url;
+  
+  // warm-start handler
+  if (self.pageLoaded) {
+    [self processOpenUrl:self.url pageLoaded:YES];
+    self.url = nil;
+  }
+}
+
+- (void)applicationPageDidLoad:(NSNotification*)notification {
+  // cold-start handler
+  
+  self.pageLoaded = YES;
+  
+  if (self.url) {
+    [self processOpenUrl:self.url pageLoaded:YES];
+    self.url = nil;
+  }
+}
+
+- (void)processOpenUrl:(NSURL*)url pageLoaded:(BOOL)pageLoaded {
+  if (!pageLoaded) {
+    // query the webview for readystate
+    NSString* readyState = [self.webView stringByEvaluatingJavaScriptFromString:@"document.readyState"];
+    pageLoaded = [readyState isEqualToString:@"loaded"] || [readyState isEqualToString:@"complete"];
+  }
+  
+  if (pageLoaded) {
+    // calls into javascript global function 'handleOpenURL'
+    NSString* jsString = [NSString stringWithFormat:@"document.addEventListener('deviceready',function(){if (typeof handleOpenURL === 'function') { handleOpenURL(\"%@\");}});", url];
+//    [self.webView stringByEvaluatingJavaScriptFromString:jsString];
+    [self.wkWebView evaluateJavaScript:jsString completionHandler:nil];
+  } else {
+    // save for when page has loaded
+    self.url = url;
+  }
 }
 
 - (void)copyLocalStorageToUIWebView:(NSNotification*)notification {
@@ -71,7 +117,24 @@
   self.webView.hidden = true;
   [self.view addSubview:self.webView];
   [self.view sendSubviewToBack:self.webView];
+
+//  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleOpenURL:) name:CDVPluginHandleOpenURLNotification object:nil];
 }
+/*
+- (void)handleOpenURL:(NSNotification*)notification {
+  // override to handle urls sent to your app
+  // register your url schemes in your App-Info.plist
+  
+  NSURL* url = [notification object];
+  
+  if ([url isKindOfClass:[NSURL class]]) {
+    NSString* jsString = [NSString stringWithFormat:@"document.addEventListener('deviceready',function(){if (typeof handleOpenURL === 'function') { handleOpenURL(\"%@\");}});", url];
+//    [self.webView stringByEvaluatingJavaScriptFromString:jsString];
+    [self.wkWebView evaluateJavaScript:jsString completionHandler:nil];
+
+  }
+}
+ */
 
 - (id)settingForKey:(NSString*)key
 {
