@@ -7,6 +7,7 @@
 #import <Cordova/CDVURLProtocol.h>
 #import "CDVWebViewUIDelegate.h"
 #import "ReroutingUIWebView.h"
+#import "AppDelegate+WKWebViewPolyfill.h"
 
 @interface CDVViewController ()
 @property (nonatomic, readwrite, retain) NSArray *startupPluginNames;
@@ -17,6 +18,8 @@
   CDVWebViewDelegate* _webViewDelegate;
   CDVWebViewUIDelegate* _webViewUIDelegate;
   BOOL _targetExistsLocally;
+  NSTimer* _crashRecoveryTimer;
+  BOOL _crashRecoveryActive;
 }
 @end
 
@@ -51,7 +54,52 @@
                                                name:UIApplicationWillTerminateNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(copyLocalStorageToUIWebView:)
                                                name:UIApplicationWillResignActiveNotification object:nil];
+
+
+  // and some more for custom url schemes
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationLaunchedWithUrl:) name:CDVPluginHandleOpenURLNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationPageDidLoad:) name:CDVPageDidLoadNotification object:nil];
+
   return self;
+}
+
+- (void)applicationLaunchedWithUrl:(NSNotification*)notification {
+  NSURL *url = [notification object];
+  self.url = url;
+
+  // warm-start handler
+  if (self.pageLoaded) {
+    [self processOpenUrl:self.url pageLoaded:YES];
+    self.url = nil;
+  }
+}
+
+- (void)applicationPageDidLoad:(NSNotification*)notification {
+  // cold-start handler
+
+  self.pageLoaded = YES;
+
+  if (self.url) {
+    [self processOpenUrl:self.url pageLoaded:YES];
+    self.url = nil;
+  }
+}
+
+- (void)processOpenUrl:(NSURL*)url pageLoaded:(BOOL)pageLoaded {
+  if (!pageLoaded) {
+    // query the webview for readystate
+    NSString* readyState = [self.webView stringByEvaluatingJavaScriptFromString:@"document.readyState"];
+    pageLoaded = [readyState isEqualToString:@"loaded"] || [readyState isEqualToString:@"complete"];
+  }
+
+  if (pageLoaded) {
+    // calls into javascript global function 'handleOpenURL'
+    NSString* jsString = [NSString stringWithFormat:@"document.addEventListener('deviceready',function(){if (typeof handleOpenURL === 'function') { handleOpenURL(\"%@\");}});", url];
+    [self.wkWebView evaluateJavaScript:jsString completionHandler:nil];
+  } else {
+    // save for when page has loaded
+    self.url = url;
+  }
 }
 
 - (void)copyLocalStorageToUIWebView:(NSNotification*)notification {
@@ -79,6 +127,26 @@
   self.webView.hidden = true;
   [self.view addSubview:self.webView];
   [self.view sendSubviewToBack:self.webView];
+}
+
+- (void)recoverFromCrash
+{
+    // When an empty title is returned, WkWebView has crashed
+    NSString* title = self.wkWebView.title;
+    if ((title == nil) || [title isEqualToString:@""]) {
+        if (_crashRecoveryActive) {
+            NSLog(@"WkWebView crash detected, recovering... ");
+            _crashRecoveryActive = false;
+            [_crashRecoveryTimer invalidate];
+            _crashRecoveryTimer = nil;
+            AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+            [appDelegate createWindowAndStartWebServer:true];
+        }
+    } else {
+
+        // Once the title has been reported back as valid, activate crash recovery
+        _crashRecoveryActive = true;
+    }
 }
 
 - (id)settingForKey:(NSString*)key
@@ -443,6 +511,11 @@
   } else {
     // we'll load once the HTTP server starts.
   }
+
+  // Start timer which periodically checks whether the app is alive
+//  if ([self settingForKey:@"RecoverFromCrash"] && [[self settingForKey:@"RecoverFromCrash"] boolValue]) {
+    _crashRecoveryTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(recoverFromCrash) userInfo:nil repeats:YES];
+//  }
 }
 
 - (WKWebView*)newCordovaWKWebViewWithFrame:(CGRect)bounds wkWebViewConfig:(WKWebViewConfiguration*) config
@@ -467,9 +540,6 @@
 
   // Hide the Top Activity THROBBER in the Battery Bar
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-
-  // TODO this seems like a hook into launching via a custom url scheme
-//  [self processOpenUrl];
 
   [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPageDidLoadNotification object:self.webView]];
 }
