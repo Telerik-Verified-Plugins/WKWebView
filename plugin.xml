@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="com.telerik.plugins.wkwebview"
-        version="0.3.6">
+        version="0.3.7">
 
   <name>WKWebView Polyfill</name>
 
@@ -48,6 +48,7 @@
     <source-file src="src/ios/MyMainViewController.m"/>
 
     <!-- the class which swaps in our controller and offers helper methods for the JS API -->
+    <source-file src="src/ios/AppDelegate+WKWebViewPolyfill.h"/>
     <source-file src="src/ios/AppDelegate+WKWebViewPolyfill.m"/>
 
     <!-- helper classes -->

@@ -41,6 +41,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.3.7__  Custom URL Schemes did not work, see #98, also this version includes crash recovery, thanks #62!
 * __0.3.6__  Bind embedded webserver to localhost so it can't be reached from the outside, thanks #64!
 * __0.3.5__  Compatibility with the statusbar plugin: allow the statusbar to not overlay the webview, thanks #6 and #20!
 * __0.3.4__  The GCDWebServer is now compatible with all iOS architectures, thanks #47 and #48!
