@@ -37,15 +37,7 @@
     _targetExistsLocally = [[NSFileManager defaultManager]
                              fileExistsAtPath:startFilePath];
     startFilePath = [startFilePath stringByDeletingLastPathComponent];
-
-    // Save the path for the app sandbox files
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString* cacheFilePath = [paths objectAtIndex:0]; // Get documents folder
-    cacheFilePath = [cacheFilePath stringByDeletingLastPathComponent];
-
     self.wwwFolderName = startFilePath;
-    self.cacheFolderName = cacheFilePath;
-
     self.alreadyLoaded = false;
   }
 
@@ -117,7 +109,7 @@
 
   self.wkWebView = [self newCordovaWKWebViewWithFrame:webViewBounds wkWebViewConfig:config];
   self.wkWebView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
-  
+
   // avoid the white flash while opening the app
   [self.wkWebView setOpaque:NO];
   self.wkWebView.backgroundColor = [UIColor clearColor];

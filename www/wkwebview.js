@@ -79,17 +79,3 @@ if(!cordova.exec.jsToNativeModes.WK_WEBVIEW_BINDING) {
 		}
 	};
 }
-
-// TODO: Have a way of fetching the given URLs for the server and the cache paths
-// as the ports are generated kinda randomly.
-//
-// var WKWebView = {
-// 	getWWWUrl = function () {
-// 		cordova.exec(null, null, "WKWebView", "getWWWUrl", []);
-// 	},
-// 	getCacheUrl = function () {
-// 		cordova.exec(null, null, "WKWebView", "getCacheUrl", []);
-// 	}
-// };
-
-// module.exports = WKWebView;

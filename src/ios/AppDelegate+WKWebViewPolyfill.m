@@ -11,9 +11,6 @@ static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelect
 GCDWebServer* _webServer;
 NSMutableDictionary* _webServerOptions;
 
-GCDWebServer* _cacheServer;
-NSMutableDictionary* _cacheServerOptions;
-
 + (void)load {
     // Swap in our own viewcontroller which loads the wkwebview, but only in case we're running iOS 8+
     if (IsAtLeastiOSVersion(@"8.0")) {
@@ -50,20 +47,21 @@ NSMutableDictionary* _cacheServerOptions;
                                 cacheAge:60
                       allowRangeRequests:YES];
 
-    NSString *cachePath = myMainViewController.cacheFolderName;
-    _cacheServer = [[GCDWebServer alloc] init];
-    _cacheServerOptions = [NSMutableDictionary dictionary];
-    // Add GET handler for local sandbox files
-    [_cacheServer addGETHandlerForBasePath:@"/"
-                             directoryPath:cachePath
-                             indexFilename:nil
-                                  cacheAge:60
-                        allowRangeRequests:YES];
+    // Add handler for anything under Data, like Documents and Library
+    [_webServer addHandlerForMethod:@"GET"
+                          pathRegex:@"/.*/Data/"
+                       requestClass:[GCDWebServerRequest class]
+                       processBlock:^GCDWebServerResponse *(GCDWebServerRequest* request) {
+                         NSData *d = [NSData dataWithContentsOfFile:request.URL.path];
+                         return [GCDWebServerDataResponse responseWithData:d contentType:@"application/octet-stream"];
+                       }
+     ];
+  
     // Initialize Server startup
     if (startWebServer) {
         [self startServer];
     }
-
+    
     // Update Swizzled ViewController with port currently used by local Server
     [myMainViewController setServerPort:_webServer.port];
 }
@@ -90,7 +88,7 @@ NSMutableDictionary* _cacheServerOptions;
     // Initialize Server listening port, initially trying 12344 for backwards compatibility
     int httpPort = 12344;
 
-    // Start Web Server
+    // Start Server
     do {
         [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort++]
                               forKey:GCDWebServerOption_Port];
@@ -99,20 +97,8 @@ NSMutableDictionary* _cacheServerOptions;
     if (error) {
         NSLog(@"Error starting http daemon: %@", error);
     } else {
+        [GCDWebServer setLogLevel:kGCDWebServerLoggingLevel_Warning];
         NSLog(@"Started http daemon: %@ ", _webServer.serverURL);
-    }
-
-
-    // Start Cache Server
-    do {
-        [_cacheServerOptions setObject:[NSNumber numberWithInteger:httpPort++]
-                              forKey:GCDWebServerOption_Port];
-    } while(![_cacheServer startWithOptions:_cacheServerOptions error:&error]);
-
-    if (error) {
-        NSLog(@"Error starting cache http daemon: %@", error);
-    } else {
-        NSLog(@"Started cache http daemon: %@ ", _cacheServer.serverURL);
     }
 }
 
