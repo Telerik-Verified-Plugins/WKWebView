@@ -109,6 +109,10 @@
 
   self.wkWebView = [self newCordovaWKWebViewWithFrame:webViewBounds wkWebViewConfig:config];
   self.wkWebView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+  
+  // avoid the white flash while opening the app
+  [self.wkWebView setOpaque:NO];
+  self.wkWebView.backgroundColor = [UIColor clearColor];
 
   _webViewOperationsDelegate = [[CDVWebViewOperationsDelegate alloc] initWithWebView:self.webView];
 
