@@ -37,7 +37,15 @@
     _targetExistsLocally = [[NSFileManager defaultManager]
                              fileExistsAtPath:startFilePath];
     startFilePath = [startFilePath stringByDeletingLastPathComponent];
+
+    // Save the path for the app sandbox files
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString* cacheFilePath = [paths objectAtIndex:0]; // Get documents folder
+    cacheFilePath = [cacheFilePath stringByDeletingLastPathComponent];
+
     self.wwwFolderName = startFilePath;
+    self.cacheFolderName = cacheFilePath;
+
     self.alreadyLoaded = false;
   }
 
@@ -545,7 +553,7 @@
 }
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-  
+
   if (!navigationAction.targetFrame) {
     // links with target="_blank" need to open outside the app, but WKWebView doesn't allow it currently
     NSURL *url = navigationAction.request.URL;
@@ -566,7 +574,7 @@
   if (![message.name isEqualToString:@"cordova"]) {
     return;
   }
-  
+
   NSArray* jsonEntry = message.body; // NSString:callbackId, NSString:service, NSString:action, NSArray:args
   CDVInvokedUrlCommand* command = [CDVInvokedUrlCommand commandFromJson:jsonEntry];
   CDV_EXEC_LOG(@"Exec(%@): Calling %@.%@", command.callbackId, command.className, command.methodName);
