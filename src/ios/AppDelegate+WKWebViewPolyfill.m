@@ -10,6 +10,7 @@ static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelect
 
 GCDWebServer* _webServer;
 NSMutableDictionary* _webServerOptions;
+NSString* appDataFolder;
 
 + (void)load {
     // Swap in our own viewcontroller which loads the wkwebview, but only in case we're running iOS 8+
@@ -34,6 +35,7 @@ NSMutableDictionary* _webServerOptions;
     self.viewController = myMainViewController;
     self.window.rootViewController = myMainViewController;
     [self.window makeKeyAndVisible];
+    appDataFolder = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByDeletingLastPathComponent];
 
     // Initialize Server environment variables
     NSString *directoryPath = myMainViewController.wwwFolderName;
@@ -47,16 +49,9 @@ NSMutableDictionary* _webServerOptions;
                                 cacheAge:60
                       allowRangeRequests:YES];
 
-    // Add handler for anything under Data, like Documents and Library
-    [_webServer addHandlerForMethod:@"GET"
-                          pathRegex:@"/.*/Data/"
-                       requestClass:[GCDWebServerRequest class]
-                       processBlock:^GCDWebServerResponse *(GCDWebServerRequest* request) {
-                         NSData *d = [NSData dataWithContentsOfFile:request.URL.path];
-                         return [GCDWebServerDataResponse responseWithData:d contentType:@"application/octet-stream"];
-                       }
-     ];
-  
+    [self addHandlerForPath:@"/Library/"];
+    [self addHandlerForPath:@"/Documents/"];
+
     // Initialize Server startup
     if (startWebServer) {
         [self startServer];
@@ -64,6 +59,21 @@ NSMutableDictionary* _webServerOptions;
     
     // Update Swizzled ViewController with port currently used by local Server
     [myMainViewController setServerPort:_webServer.port];
+}
+
+- (void)addHandlerForPath:(NSString *) path {
+  [_webServer addHandlerForMethod:@"GET"
+                        pathRegex:[@".*" stringByAppendingString:path]
+                     requestClass:[GCDWebServerRequest class]
+                     processBlock:^GCDWebServerResponse *(GCDWebServerRequest* request) {
+                       NSString *fileLocation = request.URL.path;
+                       if ([fileLocation hasPrefix:path]) {
+                         fileLocation = [appDataFolder stringByAppendingString:request.URL.path];
+                       }
+                       NSData *d = [NSData dataWithContentsOfFile:fileLocation];
+                       return [GCDWebServerDataResponse responseWithData:d contentType:@"application/octet-stream"];
+                     }
+   ];
 }
 
 - (BOOL)identity_application: (UIApplication *)application
