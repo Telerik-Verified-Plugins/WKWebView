@@ -39,10 +39,6 @@
     <!-- For WKWebView -->
     <framework src="WebKit.framework" />
 
-    <!-- GCDWebServer -->
-    <framework src="libz.dylib" />
-    <framework src="src/ios/GCDWebServer.framework" custom="true"/>
-
     <!-- the controller loading the WKWebView -->
     <header-file src="src/ios/MyMainViewController.h"/>
     <source-file src="src/ios/MyMainViewController.m"/>
@@ -58,6 +54,8 @@
     <source-file src="src/ios/CDVWebViewOperationsDelegate.m"/>
     <header-file src="src/ios/CDVWebViewUIDelegate.h"/>
     <source-file src="src/ios/CDVWebViewUIDelegate.m"/>
+    
+    <dependency id="cordova-plugin-webserver" />
 
   </platform>
 
