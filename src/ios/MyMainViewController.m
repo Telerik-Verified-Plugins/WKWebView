@@ -286,6 +286,8 @@
     }
     config.suppressesIncrementalRendering = suppressesIncrementalRendering;
     [self createGapView:config];
+    
+    [super viewDidLoad];
   }
 
   [self.wkWebView loadRequest: [NSURLRequest requestWithURL:appURL]];
