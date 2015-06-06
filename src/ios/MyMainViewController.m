@@ -381,6 +381,10 @@
     [self.wkWebView.scrollView setDecelerationRate:UIScrollViewDecelerationRateNormal];
   }
 
+  // don't show scrollbars
+  self.wkWebView.scrollView.showsHorizontalScrollIndicator = NO;
+  self.wkWebView.scrollView.showsVerticalScrollIndicator = NO;
+
   /*
    * iOS 6.0 UIWebView properties
    */

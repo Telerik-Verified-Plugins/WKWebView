@@ -42,6 +42,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.4.0__  Compatibility with Telerik LiveSync and LivePatch. Also disabled the horizontal and vertical scrollbars.
 * __0.3.8__  Adding a way to access files in '/Library/' and '/Documents/' (simply use those prefixes), thanks #88!
 * __0.3.7__  Custom URL Schemes did not work, see #98, also this version includes crash recovery, thanks #62!
 * __0.3.6__  Bind embedded webserver to localhost so it can't be reached from the outside, thanks #64!
