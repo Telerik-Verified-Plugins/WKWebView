@@ -25,7 +25,7 @@ _BETA_ - things may break, [please post your feedback :)](https://github.com/Edd
 * If you need the [device plugin](org.apache.cordova.device), use at least Cordova-iOS 3.6.3 (deviceready never fires with 3.5.0 due to a currently unknown reason).
 * When making AJAX requests to a remote server make sure it supports CORS. See the [Telerik Verified Marketplace documentation](http://plugins.telerik.com/plugin/wkwebview) for more details on this and other valuable pointers.
 * You can load files from the app's cache folders by using the entire path (/var/.../Library/...) or simply '/Library/..' (or '/Documents/..').
-* This plugin features crash recovery: if the WKWebView crashes, it will auto-restart (otherwise you'd have an app with a blank page as it doesn't crash the app itself). Crash recovery requires a filled `<title>anything</title>` tag in your html files. If you want to disable this feature, set the `config.xml` property `DisableCrashRecovery` to `false`.
+* This plugin features crash recovery: if the WKWebView crashes, it will auto-restart (otherwise you'd have an app with a blank page as it doesn't crash the app itself). Crash recovery requires a filled `<title>anything</title>` tag in your html files. If you want to disable this feature, set the `config.xml` property `DisableCrashRecovery` to `true`.
 
 ## 2. Screenshot
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
