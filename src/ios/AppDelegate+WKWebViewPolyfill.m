@@ -10,6 +10,7 @@ static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelect
 
 @implementation AppDelegate (WKWebViewPolyfill)
 
+NSString *const FileSchemaConstant = @"file://";
 GCDWebServer* _webServer;
 NSMutableDictionary* _webServerOptions;
 NSString* appDataFolder;
@@ -72,8 +73,13 @@ NSString* appDataFolder;
                        if ([fileLocation hasPrefix:path]) {
                          fileLocation = [appDataFolder stringByAppendingString:request.URL.path];
                        }
-                       NSData *d = [NSData dataWithContentsOfFile:fileLocation];
-                       return [GCDWebServerDataResponse responseWithData:d contentType:@"application/octet-stream"];
+                       
+                       fileLocation = [fileLocation stringByReplacingOccurrencesOfString:FileSchemaConstant withString:@""];
+                       if (![[NSFileManager defaultManager] fileExistsAtPath:fileLocation]) {
+                           return nil;
+                       }
+                         
+                       return [GCDWebServerFileResponse responseWithFile:fileLocation];
                      }
    ];
 }
