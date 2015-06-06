@@ -515,9 +515,9 @@
   }
 
   // Start timer which periodically checks whether the app is alive
-//  if ([self settingForKey:@"RecoverFromCrash"] && [[self settingForKey:@"RecoverFromCrash"] boolValue]) {
+  if (![self settingForKey:@"DisableCrashRecovery"] || ![[self settingForKey:@"DisableCrashRecovery"] boolValue]) {
     _crashRecoveryTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(recoverFromCrash) userInfo:nil repeats:YES];
-//  }
+  }
 }
 
 - (WKWebView*)newCordovaWKWebViewWithFrame:(CGRect)bounds wkWebViewConfig:(WKWebViewConfiguration*) config
