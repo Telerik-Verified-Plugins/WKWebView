@@ -25,6 +25,7 @@ _BETA_ - things may break, [please post your feedback :)](https://github.com/Edd
 * If you need the [device plugin](org.apache.cordova.device), use at least Cordova-iOS 3.6.3 (deviceready never fires with 3.5.0 due to a currently unknown reason).
 * When making AJAX requests to a remote server make sure it supports CORS. See the [Telerik Verified Marketplace documentation](http://plugins.telerik.com/plugin/wkwebview) for more details on this and other valuable pointers.
 * You can load files from the app's cache folders by using the entire path (/var/.../Library/...) or simply '/Library/..' (or '/Documents/..').
+* This plugin features crash recovery: if the WKWebView crashes, it will auto-restart (otherwise you'd have an app with a blank page as it doesn't crash the app itself). Crash recovery requires a filled `<title>anything</title>` tag in your html files. If you want to disable this feature, set the `config.xml` property `DisableCrashRecovery` to `false`.
 
 ## 2. Screenshot
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
@@ -42,7 +43,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
-* __0.4.0__  Compatibility with Telerik LiveSync and LivePatch. Also disabled the horizontal and vertical scrollbars.
+* __0.4.0__  Compatibility with Telerik LiveSync and LivePatch. Disabled the horizontal and vertical scrollbars. Added support for config.xml property DisableCrashRecovery (default false).
 * __0.3.8__  Adding a way to access files in '/Library/' and '/Documents/' (simply use those prefixes), thanks #88!
 * __0.3.7__  Custom URL Schemes did not work, see #98, also this version includes crash recovery, thanks #62!
 * __0.3.6__  Bind embedded webserver to localhost so it can't be reached from the outside, thanks #64!
