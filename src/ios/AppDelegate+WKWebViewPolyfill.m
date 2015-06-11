@@ -11,6 +11,7 @@ static void swizzleMethod(Class class, SEL destinationSelector, SEL sourceSelect
 @implementation AppDelegate (WKWebViewPolyfill)
 
 NSString *const FileSchemaConstant = @"file://";
+NSString *const ServerCreatedNotificationName = @"WKWebView.WebServer.Created";
 GCDWebServer* _webServer;
 NSMutableDictionary* _webServerOptions;
 NSString* appDataFolder;
@@ -44,14 +45,16 @@ NSString* appDataFolder;
     NSString *directoryPath = myMainViewController.wwwFolderName;
     _webServer = [[GCDWebServer alloc] init];
     _webServerOptions = [NSMutableDictionary dictionary];
-
+    
     // Add GET handler for local "www/" directory
     [_webServer addGETHandlerForBasePath:@"/"
                            directoryPath:directoryPath
                            indexFilename:nil
                                 cacheAge:60
                       allowRangeRequests:YES];
-
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ServerCreatedNotificationName object: @[myMainViewController, _webServer]];
+    
     [self addHandlerForPath:@"/Library/"];
     [self addHandlerForPath:@"/Documents/"];
 
