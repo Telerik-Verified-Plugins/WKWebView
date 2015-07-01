@@ -20,4 +20,13 @@
   [self.wkWebView addSubview:view];
 }
 
+- (void)layoutSubviews {
+    self.wkWebView.frame = self.frame;
+    self.wkWebView.scrollView.delegate = self;
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    [self.scrollView.delegate scrollViewDidScroll:scrollView];
+}
+
 @end
