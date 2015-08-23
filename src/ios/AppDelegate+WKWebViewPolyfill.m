@@ -41,28 +41,31 @@ NSString* appDataFolder;
     [self.window makeKeyAndVisible];
     appDataFolder = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByDeletingLastPathComponent];
 
-    // Initialize Server environment variables
-    NSString *directoryPath = myMainViewController.wwwFolderName;
-    _webServer = [[GCDWebServer alloc] init];
-    _webServerOptions = [NSMutableDictionary dictionary];
-    
-    // Add GET handler for local "www/" directory
-    [_webServer addGETHandlerForBasePath:@"/"
-                           directoryPath:directoryPath
-                           indexFilename:nil
-                                cacheAge:60
-                      allowRangeRequests:YES];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ServerCreatedNotificationName object: @[myMainViewController, _webServer]];
-    
-    [self addHandlerForPath:@"/Library/"];
-    [self addHandlerForPath:@"/Documents/"];
+    // webserver no longer needed for iOS 9, yay!
+    if (!IsAtLeastiOSVersion(@"9.0")) {
+      // Initialize Server environment variables
+      NSString *directoryPath = myMainViewController.wwwFolderName;
+      _webServer = [[GCDWebServer alloc] init];
+      _webServerOptions = [NSMutableDictionary dictionary];
 
-    // Initialize Server startup
-    if (startWebServer) {
-        [self startServer];
+      // Add GET handler for local "www/" directory
+      [_webServer addGETHandlerForBasePath:@"/"
+                             directoryPath:directoryPath
+                             indexFilename:nil
+                                  cacheAge:60
+                        allowRangeRequests:YES];
+
+      [[NSNotificationCenter defaultCenter] postNotificationName:ServerCreatedNotificationName object: @[myMainViewController, _webServer]];
+
+      [self addHandlerForPath:@"/Library/"];
+      [self addHandlerForPath:@"/Documents/"];
+
+      // Initialize Server startup
+      if (startWebServer) {
+          [self startServer];
+      }
     }
-    
+
     // Update Swizzled ViewController with port currently used by local Server
     [myMainViewController setServerPort:_webServer.port];
 }

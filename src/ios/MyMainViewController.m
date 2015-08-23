@@ -220,8 +220,15 @@
     [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
         _userAgentLockToken = lockToken;
         [CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
+
+    // This is only for iOS 9 SDK
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 90000
+    [self.wkWebView loadFileURL:URL allowingReadAccessToURL:URL];
+#else
         NSURLRequest* appReq = [NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:20.0];
             [self.wkWebView loadRequest:appReq];
+#endif
+
     }];
 }
 
@@ -249,6 +256,11 @@
     appURL = [NSURL URLWithString:self.startPage];
   } else if ([self.wwwFolderName rangeOfString:@"://"].location != NSNotFound) {
     appURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", self.wwwFolderName, self.startPage]];
+  }
+
+  // iOS9 (runtime) compatibility
+  if (IsAtLeastiOSVersion(@"9.0")) {
+    appURL = [NSURL URLWithString:[NSString stringWithFormat:@"file://%@/%@", self.wwwFolderName, self.startPage]];
   }
 
   // // Fix the iOS 5.1 SECURITY_ERR bug (CB-347), this must be before the webView is instantiated ////
@@ -298,6 +310,7 @@
 
   // Configure WebView
   self.wkWebView.navigationDelegate = self;
+  self.wkWebView.UIDelegate = self;
 
   // register this viewcontroller with the NSURLProtocol, only after the User-Agent is set
   [CDVURLProtocol registerViewController:self];
@@ -537,8 +550,22 @@
   return cordovaView;
 }
 
-#pragma mark WKNavigationDelegate implementation
 
+/*
+#pragma mark WKNavigationDelegate implementation
+// allow opening links like mailto: / tel:
+- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures {
+
+  if (!navigationAction.targetFrame.isMainFrame) {
+    [webView loadRequest:navigationAction.request];
+  }
+
+  return nil;
+}
+ */
+
+
+#pragma mark WKNavigationDelegate implementation
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
 {
   // It's safe to release the lock even if this is just a sub-frame that's finished loading.
