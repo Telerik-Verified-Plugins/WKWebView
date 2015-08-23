@@ -113,9 +113,11 @@
   [self.wkWebView setOpaque:NO];
   NSString* setting = @"BackgroundColor";
   if ([self settingForKey:setting]) {
-      self.wkWebView.backgroundColor = [self colorFromHexString:[self settingForKey:setting]];
+    self.wkWebView.backgroundColor = [self colorFromHexString:[self settingForKey:setting]];
+    self.view.backgroundColor = self.wkWebView.backgroundColor;
   } else {
-      self.wkWebView.backgroundColor = [UIColor whiteColor];
+    self.wkWebView.backgroundColor = [UIColor clearColor];
+    self.view.backgroundColor = [UIColor whiteColor];
   }
 
   _webViewOperationsDelegate = [[CDVWebViewOperationsDelegate alloc] initWithWebView:self.webView];
