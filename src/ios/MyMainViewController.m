@@ -41,12 +41,13 @@
     self.alreadyLoaded = false;
   }
 
+  if (![self settingForKey:@"DisableLocalStorageSyncWithUIWebView"] || ![[self settingForKey:@"DisableLocalStorageSyncWithUIWebView"] boolValue]) {
   // configure listeners which fires when the application goes away
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(copyLocalStorageToUIWebView:)
                                                name:UIApplicationWillTerminateNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(copyLocalStorageToUIWebView:)
                                                name:UIApplicationWillResignActiveNotification object:nil];
-
+  }
 
   // and some more for custom url schemes
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationLaunchedWithUrl:) name:CDVPluginHandleOpenURLNotification object:nil];
@@ -339,17 +340,19 @@
   }
   self.uiWebViewLS = [cacheFolder stringByAppendingPathComponent:@"file__0.localstorage"];
 
-  // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)
-  self.wkWebViewLS = [[NSString alloc] initWithString: [appLibraryFolder stringByAppendingPathComponent:@"WebKit"]];
+  if (![self settingForKey:@"DisableLocalStorageSyncWithUIWebView"] || ![[self settingForKey:@"DisableLocalStorageSyncWithUIWebView"] boolValue]) {
+    // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)
+    self.wkWebViewLS = [[NSString alloc] initWithString: [appLibraryFolder stringByAppendingPathComponent:@"WebKit"]];
 
 #if TARGET_IPHONE_SIMULATOR
-  // the simulutor squeezes the bundle id into the path
-  NSString* bundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
-  self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:bundleIdentifier];
+    // the simulutor squeezes the bundle id into the path
+    NSString* bundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+    self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:bundleIdentifier];
 #endif
 
-  self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/file__0.localstorage"];
-  [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
+    self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/file__0.localstorage"];
+    [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
+  }
 
   /*
    * This is for iOS 4.x, where you can allow inline <video> and <audio>, and also autoplay them

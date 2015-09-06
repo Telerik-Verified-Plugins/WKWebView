@@ -43,6 +43,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.5.1__  Added support for `config.xml` property `DisableLocalStorageSyncWithUIWebView` (default `false`). Set it to `true` if you want to switch back to UIWebView and retain LS changes made while running WKWebView.
 * __0.5.0__  iOS9 (beta) compatibility, keyboard scroll fix, white keyboard background if no specific color is specified (was black).
 * __0.4.0__  Compatibility with Telerik LiveSync and LivePatch. Disabled the horizontal and vertical scrollbars. Added support for `config.xml` property `DisableCrashRecovery` (default `false`).
 * __0.3.8__  Adding a way to access files in '/Library/' and '/Documents/' (simply use those prefixes), thanks #88!
