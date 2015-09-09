@@ -261,7 +261,7 @@
 
   // iOS9 (runtime) compatibility
   if (IsAtLeastiOSVersion(@"9.0")) {
-    appURL = [NSURL URLWithString:[NSString stringWithFormat:@"file://%@/%@", self.wwwFolderName, self.startPage]];
+    appURL = [NSURL fileURLWithPath: [NSString stringWithFormat:@"file://%@/%@", self.wwwFolderName, self.startPage]];
   }
 
   // // Fix the iOS 5.1 SECURITY_ERR bug (CB-347), this must be before the webView is instantiated ////
