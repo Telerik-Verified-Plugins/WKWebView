@@ -34,7 +34,7 @@
 }
 
 - (void)     webView:(WKWebView*)webView runJavaScriptAlertPanelWithMessage:(NSString*)message
-    initiatedByFrame:(WKFrameInfo*)frame completionHandler:(void (^)())completionHandler
+    initiatedByFrame:(WKFrameInfo*)frame completionHandler:(void (^)(void))completionHandler
 {
   UIAlertController* alert = [UIAlertController alertControllerWithTitle:self.title
                                                                  message:message

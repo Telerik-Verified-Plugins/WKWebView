@@ -17,8 +17,6 @@
  under the License.
  */
 
-#import <Foundation/Foundation.h>
-
 #ifdef __IPHONE_8_0
 #import <WebKit/WebKit.h>
 #endif

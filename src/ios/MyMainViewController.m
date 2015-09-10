@@ -315,7 +315,6 @@
 
   // Configure WebView
   self.wkWebView.navigationDelegate = self;
-  self.wkWebView.UIDelegate = self;
 
   // register this viewcontroller with the NSURLProtocol, only after the User-Agent is set
   [CDVURLProtocol registerViewController:self];
