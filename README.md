@@ -1,6 +1,10 @@
 # Cordova WKWebView Polyfill Plugin
 by [Eddy Verbruggen](http://twitter.com/eddyverbruggen) / [Telerik](http://www.telerik.com)
 
+
+_iOS9 warning:_ please test your app on iOS 9 and move to the 0.6.0 release if things are broken!
+
+
 ## 0. Index
 
 1. [Description](#1-description)
