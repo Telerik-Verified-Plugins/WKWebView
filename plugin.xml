@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="com.telerik.plugins.wkwebview"
-        version="0.5.1">
+        version="0.6.0-dev">
 
   <name>WKWebView Polyfill</name>
 
@@ -34,6 +34,17 @@
       <feature name="WKWebViewPolyfill">
         <param name="ios-package" value="WKWebViewPolyfill"/>
       </feature>
+    </config-file>
+
+    <!--
+     NOTE: It would be nicer to allow http loads from localhost only,
+           but without this suddenly remote non-https calls will stop working for ppl on iOS9.
+    -->
+    <config-file target="*-Info.plist" parent="NSAppTransportSecurity">
+      <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+      </dict>
     </config-file>
 
     <!-- For WKWebView -->

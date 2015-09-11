@@ -20,6 +20,7 @@
   BOOL _targetExistsLocally;
   NSTimer* _crashRecoveryTimer;
   BOOL _crashRecoveryActive;
+  NSURL *_startURL;
 }
 @end
 
@@ -221,19 +222,8 @@
     [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
       _userAgentLockToken = lockToken;
       [CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
-
-    // This is only for iOS 9 SDK
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 90000
-      if (IsAtLeastiOSVersion(@"9.0")) {
-        [self.wkWebView loadFileURL:URL allowingReadAccessToURL:URL];
-      } else {
-        NSURLRequest* appReq = [NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:20.0];
-        [self.wkWebView loadRequest:appReq];
-      }
-#else
       NSURLRequest* appReq = [NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:20.0];
       [self.wkWebView loadRequest:appReq];
-#endif
     }];
 }
 
@@ -243,12 +233,11 @@
     // If we already loaded for some reason, we don't care about the local port.
     return;
   } else {
-    NSURL* startURL = [NSURL URLWithString:[NSString stringWithFormat:
+    _startURL = [NSURL URLWithString:[NSString stringWithFormat:
                                             @"http://localhost:%hu/%@",
                                             port,
                                             self.startPage]];
-
-    [self loadURL:startURL];
+    [self loadURL:_startURL];
   }
 }
 
@@ -265,11 +254,10 @@
 
   // iOS9 (runtime) compatibility
   if (IsAtLeastiOSVersion(@"9.0")) {
-    appURL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"file://%@/%@", self.wwwFolderName, self.startPage] isDirectory:NO];
+    appURL = _startURL;
   }
 
-  // // Fix the iOS 5.1 SECURITY_ERR bug (CB-347), this must be before the webView is instantiated ////
-
+  //// Fix the iOS 5.1 SECURITY_ERR bug (CB-347), this must be before the webView is instantiated ////
   NSString* backupWebStorageType = @"cloud"; // default value
 
   id backupWebStorage = [self settingForKey:@"BackupWebStorage"];
@@ -310,8 +298,6 @@
     config.suppressesIncrementalRendering = suppressesIncrementalRendering;
     [self createGapView:config];
   }
-
-  [self.wkWebView loadRequest: [NSURLRequest requestWithURL:appURL]];
 
   // Configure WebView
   self.wkWebView.navigationDelegate = self;
