@@ -23,8 +23,9 @@ _BETA_ - things may break, [please post your feedback :)](https://github.com/Edd
 * Will hopefully cease to exist soon (when Apple releases a fixed WKWebView so Cordova can use it without the hacks I needed to apply).
 * As a matter of fact, [Apache is working on a similar plugin (which you can't use at the moment of writing)](https://github.com/apache/cordova-plugins/tree/master/wkwebview-engine) which I came across after releasing version 0.1.1. It targets Cordova 3.7.0 and up whereas this plugin is supported on 3.0.0 an up. 
 
-### TIPS
+### Take note!
 
+* For a seamless upgrade to iOS9 this plugin wipes any existing `NSAppTransportSecurity` configuration you may have done (a new feature in iOS9) to allow communication with even HTTP (non-S) backends, like previous iOS versions did. You can and should configure access rules (`config.xml`) and use the whitelist plugin as before.
 * [Ionic](http://ionicframework.com/) tip: to prevent flashes of a black background, make sure you set `ion-nav-view`'s `background-color` to `transparent`.
 * If you need the [device plugin](org.apache.cordova.device), use at least Cordova-iOS 3.6.3 (deviceready never fires with 3.5.0 due to a currently unknown reason).
 * When making AJAX requests to a remote server make sure it supports CORS. See the [Telerik Verified Marketplace documentation](http://plugins.telerik.com/plugin/wkwebview) for more details on this and other valuable pointers.
