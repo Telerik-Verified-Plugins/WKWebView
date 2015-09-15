@@ -32,4 +32,9 @@
     self.wkWebView.frame = self.frame;
 }
 
+// Ionic's Deploy plugin uses this
+- (void)loadRequest:(NSURLRequest*)request {
+    [self.wkWebView loadRequest:request];
+}
+
 @end
