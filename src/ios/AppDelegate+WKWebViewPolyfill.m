@@ -58,6 +58,7 @@ NSString* appDataFolder;
 
     [self addHandlerForPath:@"/Library/"];
     [self addHandlerForPath:@"/Documents/"];
+    [self addHandlerForPath:@"/tmp/"];
 
     // Initialize Server startup
     if (startWebServer) {
