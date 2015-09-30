@@ -31,7 +31,7 @@ _BETA_ - things may break, [please post your feedback :)](https://github.com/Edd
 * When making AJAX requests to a remote server make sure it supports CORS. See the [Telerik Verified Marketplace documentation](http://plugins.telerik.com/plugin/wkwebview) for more details on this and other valuable pointers. As a last resort you can add [this CORS-Proxy](https://github.com/gr2m/CORS-Proxy) between your app and the server.
 * You can load files from the app's cache folders by using the entire path (/var/.../Library/...) or simply '/Library/..' (or '/Documents/..').
 * This plugin features crash recovery: if the WKWebView crashes, it will auto-restart (otherwise you'd have an app with a blank page as it doesn't crash the app itself). Crash recovery requires a filled `<title>anything</title>` tag in your html files. If you want to disable this feature, set the `config.xml` property `DisableCrashRecovery` to `true`.
-* In order to open links like `tel:` and `mailto:` you need to add `target="_blank"`: <a href="tel:+31611223344" target="_blank">call!</a>`
+* In order to open links like `tel:` and `mailto:` you need to add `target="_blank"`: `<a href="tel:+31611223344" target="_blank">call!</a>`
 
 ## 2. Screenshot
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
