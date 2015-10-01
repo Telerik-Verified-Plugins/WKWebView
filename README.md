@@ -43,7 +43,7 @@ It's a screenshot of the [demo app](demo/index.html).
 
 From npm
 ```
-$ cordova plugin add @telerik/cordova-plugin-wkwebview
+$ cordova plugin add https://github.com/AlBusso/WKWebView.git
 $ cordova prepare
 ```
 
