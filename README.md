@@ -50,6 +50,7 @@ $ cordova prepare
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.6.2__  LocalStorage is copied from UIWebView to WKWebView again (iOS location was recently changed as it appears).
 * __0.6.1__  Allow reading files from /tmp, so the camera plugin file URI's work. Thx #155.
 * __0.6.0__  iOS9 (GM) compatibility. Also, compatibility with iOS8 devices when building with XCode 7 (iOS9 SDK). Dialogs (alert, prompt, confirm) were broken.
 * __0.5.1__  Added support for `config.xml` property `DisableLocalStorageSyncWithUIWebView` (default `false`). Set it to `true` if you want to switch back to UIWebView and retain LS changes made while running WKWebView.

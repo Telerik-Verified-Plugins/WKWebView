@@ -112,6 +112,14 @@
   self.wkWebView = [self newCordovaWKWebViewWithFrame:webViewBounds wkWebViewConfig:config];
   self.wkWebView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
 
+/*
+#ifdef __IPHONE_9_0
+  // 3D touch-triggered URL preview feature -
+  // setting this to the default value, just to remind myself to play with it once I have a 6s.
+  self.wkWebView.allowsLinkPreview = NO;
+#endif
+*/
+
   [self.wkWebView setOpaque:NO];
   NSString* setting = @"BackgroundColor";
   if ([self settingForKey:setting]) {
@@ -339,7 +347,8 @@
     self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:bundleIdentifier];
 #endif
 
-    self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/file__0.localstorage"];
+    // TODO if the app is ever launched on a different port.. LS can't be loaded -- not worse than the previous implementation, but still
+    self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/http_localhost_12344.localstorage"];
     [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
   }
 
