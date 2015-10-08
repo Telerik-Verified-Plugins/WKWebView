@@ -584,6 +584,31 @@
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
 
+  if(webView != self.wkWebView) {
+      decisionHandler(WKNavigationActionPolicyAllow);
+      return;
+  }
+
+  UIApplication *app = [UIApplication sharedApplication];
+  NSURL         *url = navigationAction.request.URL;
+
+  if (!navigationAction.targetFrame) {
+      if ([app canOpenURL:url]) {
+          [app openURL:url];
+          decisionHandler(WKNavigationActionPolicyCancel);
+          return;
+      }
+  }
+  if ([url.scheme isEqualToString:@"tel"])
+  {
+      if ([app canOpenURL:url])
+      {
+          [app openURL:url];
+          decisionHandler(WKNavigationActionPolicyCancel);
+          return;
+      }
+  }
+
   if (!navigationAction.targetFrame) {
     // links with target="_blank" need to open outside the app, but WKWebView doesn't allow it currently
     NSURL *url = navigationAction.request.URL;
