@@ -71,7 +71,7 @@ NSString* appDataFolder;
 
 - (void)addHandlerForPath:(NSString *) path {
   [_webServer addHandlerForMethod:@"GET"
-                        pathRegex:[@".*" stringByAppendingString:path]
+                     pathRegex: [NSString stringWithFormat:@"^%@.*", path]
                      requestClass:[GCDWebServerRequest class]
                      processBlock:^GCDWebServerResponse *(GCDWebServerRequest* request) {
                        NSString *fileLocation = request.URL.path;
