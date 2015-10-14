@@ -1,6 +1,6 @@
 {
-    "version": "0.6.3",
-    "name": "@telerik/cordova-plugin-wkwebview",
+    "version": "0.6.4",
+    "name": "cordova-plugin-wkwebview",
     "cordova_name": "WKWebView Polyfill",
     "description": "A drop-in replacement of UIWebView for boosted performance and enhanced HTML5 support",
     "license": "MIT",

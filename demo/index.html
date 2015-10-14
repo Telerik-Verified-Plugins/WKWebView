@@ -81,7 +81,7 @@
     var proxied = window.XMLHttpRequest.prototype.open;
     window.XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
       if (method == "GET" && url.indexOf("://") == -1) {
-        arguments[1] = "http://localhost:12344/" + url;
+        arguments[1] = "http://localhost:12344/" + url; // assuming the (overridable) port is 12344
       }
       return proxied.apply(this, arguments);
     };

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="com.telerik.plugins.wkwebview"
-        version="0.6.3">
+        version="0.6.4">
 
   <name>WKWebView Polyfill</name>
 
@@ -18,6 +18,8 @@
   <repo>https://github.com/Telerik-Verified-Plugins/WKWebView.git</repo>
 
   <issue>https://github.com/Telerik-Verified-Plugins/WKWebView/issues</issue>
+
+  <preference name="WKWEBVIEW_SERVER_PORT" default="12344" />
 
   <engines>
     <engine name="cordova" version=">=3.0.0"/>
@@ -45,6 +47,10 @@
         <key>NSAllowsArbitraryLoads</key>
         <true/>
       </dict>
+    </config-file>
+
+    <config-file target="*-Info.plist" parent="WKWebViewPluginEmbeddedServerPort">
+      <string>$WKWEBVIEW_SERVER_PORT</string>
     </config-file>
 
     <!-- For WKWebView -->

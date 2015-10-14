@@ -43,13 +43,18 @@ It's a screenshot of the [demo app](demo/index.html).
 
 From npm
 ```
-$ cordova plugin add @telerik/cordova-plugin-wkwebview
-$ cordova prepare
+$ cordova plugin add cordova-plugin-wkwebview
+```
+
+Specify a custom port (default 12344), you can omit this if you want to use the default in case you use a recent Cordova CLI version
+```
+$ cordova plugin add cordova-plugin-wkwebview --variable WKWEBVIEW_SERVER_PORT=12344
 ```
 
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.6.4__  On top of the port preference introduced in 0.6.3 you can now override the default variable when installing this plugin (see 'Installation').
 * __0.6.3__  By default the embedded webserver uses port `12344`, but if you want to you can now override that port by setting f.i. `<preference name="WKWebViewPluginEmbeddedServerPort" value="20000" />` in `config.xml`.
 * __0.6.2__  LocalStorage is copied from UIWebView to WKWebView again (iOS location was recently changed as it appears).
 * __0.6.1__  Allow reading files from /tmp, so the camera plugin file URI's work. Thx #155.

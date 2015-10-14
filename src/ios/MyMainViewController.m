@@ -237,7 +237,7 @@
 
 - (void)setServerPort:(unsigned short)port
 {
-  if(self.alreadyLoaded) {
+  if (self.alreadyLoaded) {
     // If we already loaded for some reason, we don't care about the local port.
     return;
   } else {
@@ -325,32 +325,6 @@
                                       ([backupWebStorageType isEqualToString:@"cloud"] && !IsAtLeastiOSVersion(@"6.0")))) {
     [self registerPlugin:[[CDVLocalStorage alloc] initWithWebView:self.webView] withClassName:NSStringFromClass([CDVLocalStorage class])];
   };
-
-  // Copy UIWebView to WKWebView so upgrading to the new webview is less of a pain in the ..
-  NSString* appLibraryFolder = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-  NSString* cacheFolder;
-
-  if ([[NSFileManager defaultManager] fileExistsAtPath:[appLibraryFolder stringByAppendingPathComponent:@"WebKit/LocalStorage/file__0.localstorage"]]) {
-    cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"WebKit/LocalStorage"];
-  } else {
-    cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
-  }
-  self.uiWebViewLS = [cacheFolder stringByAppendingPathComponent:@"file__0.localstorage"];
-
-  if (![self settingForKey:@"DisableLocalStorageSyncWithUIWebView"] || ![[self settingForKey:@"DisableLocalStorageSyncWithUIWebView"] boolValue]) {
-    // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)
-    self.wkWebViewLS = [[NSString alloc] initWithString: [appLibraryFolder stringByAppendingPathComponent:@"WebKit"]];
-
-#if TARGET_IPHONE_SIMULATOR
-    // the simulutor squeezes the bundle id into the path
-    NSString* bundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
-    self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:bundleIdentifier];
-#endif
-
-    // TODO if the app is ever launched on a different port.. LS can't be loaded -- not worse than the previous implementation, but still
-    self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:@"WebsiteData/LocalStorage/http_localhost_12344.localstorage"];
-    [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
-  }
 
   /*
    * This is for iOS 4.x, where you can allow inline <video> and <audio>, and also autoplay them
@@ -535,6 +509,37 @@
   // Start timer which periodically checks whether the app is alive
   if (![self settingForKey:@"DisableCrashRecovery"] || ![[self settingForKey:@"DisableCrashRecovery"] boolValue]) {
     _crashRecoveryTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(recoverFromCrash) userInfo:nil repeats:YES];
+  }
+}
+
+- (void) copyLS:(unsigned short)httpPort
+{
+  // Copy LS of UIWebView to WKWebView so upgrading to the new webview is less of a pain in the ..
+  NSString* appLibraryFolder = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+  NSString* cacheFolder;
+
+  if ([[NSFileManager defaultManager] fileExistsAtPath:[appLibraryFolder stringByAppendingPathComponent:@"WebKit/LocalStorage/file__0.localstorage"]]) {
+    cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"WebKit/LocalStorage"];
+  } else {
+    cacheFolder = [appLibraryFolder stringByAppendingPathComponent:@"Caches"];
+  }
+  self.uiWebViewLS = [cacheFolder stringByAppendingPathComponent:@"file__0.localstorage"];
+
+  if (![self settingForKey:@"DisableLocalStorageSyncWithUIWebView"] || ![[self settingForKey:@"DisableLocalStorageSyncWithUIWebView"] boolValue]) {
+    // copy the localStorage DB of the old webview to the new one (it's copied back when the app is suspended/shut down)
+    self.wkWebViewLS = [[NSString alloc] initWithString: [appLibraryFolder stringByAppendingPathComponent:@"WebKit"]];
+
+#if TARGET_IPHONE_SIMULATOR
+    // the simulutor squeezes the bundle id into the path
+    NSString* bundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+    self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:bundleIdentifier];
+#endif
+
+    // TODO if the app is ever launched on a different port.. LS can't be loaded -- not worse than the previous implementation, but still
+    // TODO use the port, luke!
+    NSString *portAsString = [NSString stringWithFormat:@"%d", httpPort];
+    self.wkWebViewLS = [self.wkWebViewLS stringByAppendingPathComponent:[[@"WebsiteData/LocalStorage/http_localhost_" stringByAppendingString:portAsString] stringByAppendingString:@".localstorage"]];
+    [[CDVLocalStorage class] copyFrom:self.uiWebViewLS to:self.wkWebViewLS error:nil];
   }
 }
 

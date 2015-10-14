@@ -18,6 +18,7 @@
 @property (nonatomic, readwrite, assign) BOOL alreadyLoaded;
 
 - (void)loadURL:(NSURL*)URL;
+- (void)copyLS:(unsigned short)httpPort;
 - (void)setServerPort:(unsigned short) port;
 
 @end
