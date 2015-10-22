@@ -54,6 +54,7 @@ $ cordova plugin add cordova-plugin-wkwebview --variable WKWEBVIEW_SERVER_PORT=1
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+* __0.6.5__  `KeyboardDisplayRequiresUserAction` works! So set to `false` if you want the keyboard to pop up when programmatically focussing an input field.
 * __0.6.4__  On top of the port preference introduced in 0.6.3 you can now override the default variable when installing this plugin (see 'Installation').
 * __0.6.3__  By default the embedded webserver uses port `12344`, but if you want to you can now override that port by setting f.i. `<preference name="WKWebViewPluginEmbeddedServerPort" value="20000" />` in `config.xml`.
 * __0.6.2__  LocalStorage is copied from UIWebView to WKWebView again (iOS location was recently changed as it appears).

@@ -1,3 +1,4 @@
+#import <objc/runtime.h>
 #import "MyMainViewController.h"
 #import <Cordova/CDVTimer.h>
 #import <Cordova/CDVLocalStorage.h>
@@ -392,6 +393,10 @@
     if ([self.webView respondsToSelector:@selector(setKeyboardDisplayRequiresUserAction:)]) {
       [self.webView setValue:[NSNumber numberWithBool:keyboardDisplayRequiresUserAction] forKey:@"keyboardDisplayRequiresUserAction"];
     }
+    
+    if (!keyboardDisplayRequiresUserAction) {
+      [self keyboardDisplayDoesNotRequireUserAction];
+    }
   }
 
   /*
@@ -599,6 +604,18 @@
     }
   }
   decisionHandler(WKNavigationActionPolicyAllow);
+}
+
+// this is by far the weirest piece of code I've produced to date (swizzling a private method)
+- (void) keyboardDisplayDoesNotRequireUserAction {
+  SEL sel = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:userObject:");
+  Class WKContentView = NSClassFromString(@"WKContentView");
+  Method method = class_getInstanceMethod(WKContentView, sel);
+  IMP originalImp = method_getImplementation(method);
+  IMP imp = imp_implementationWithBlock(^void(id me, void* arg0, BOOL arg1, BOOL arg2, id arg3) {
+    ((void (*)(id, SEL, void*, BOOL, BOOL, id))originalImp)(me, sel, arg0, TRUE, arg2, arg3);
+  });
+  method_setImplementation(method, imp);
 }
 
 #pragma mark WKScriptMessageHandler implementation
