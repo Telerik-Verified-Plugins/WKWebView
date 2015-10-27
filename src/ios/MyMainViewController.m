@@ -242,10 +242,14 @@
     // If we already loaded for some reason, we don't care about the local port.
     return;
   } else {
-    _startURL = [NSURL URLWithString:[NSString stringWithFormat:
-                                            @"http://localhost:%hu/%@",
-                                            port,
-                                            self.startPage]];
+    if ([self.startPage hasPrefix:@"http"]) {
+      _startURL = [NSURL URLWithString:self.startPage];
+    } else {
+      _startURL = [NSURL URLWithString:[NSString stringWithFormat:
+                                              @"http://localhost:%hu/%@",
+                                              port,
+                                              self.startPage]];
+    }
     [self loadURL:_startURL];
   }
 }
