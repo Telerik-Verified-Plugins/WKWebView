@@ -38,8 +38,9 @@
     NSString* startFilePath = [self.commandDelegate pathForResource:[startURL path]];
     _targetExistsLocally = [[NSFileManager defaultManager]
                              fileExistsAtPath:startFilePath];
-    startFilePath = [startFilePath stringByDeletingLastPathComponent];
-    self.wwwFolderName = startFilePath;
+    NSRange range = [startFilePath rangeOfString:self.startPage options:NSBackwardsSearch];
+    NSString* docRoot = [startFilePath substringToIndex:range.location];
+    self.docRoot = docRoot;
     self.alreadyLoaded = false;
   }
 
@@ -393,7 +394,7 @@
     if ([self.webView respondsToSelector:@selector(setKeyboardDisplayRequiresUserAction:)]) {
       [self.webView setValue:[NSNumber numberWithBool:keyboardDisplayRequiresUserAction] forKey:@"keyboardDisplayRequiresUserAction"];
     }
-    
+
     if (!keyboardDisplayRequiresUserAction) {
       [self keyboardDisplayDoesNotRequireUserAction];
     }
