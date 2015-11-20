@@ -34,7 +34,10 @@
 
 // Ionic's Deploy plugin uses this
 - (void)loadRequest:(NSURLRequest*)request {
-    [self.wkWebView loadRequest:request];
+    NSMutableURLRequest *mutableRequest = [request mutableCopy];
+    NSString *urlString = [request.URL absoluteString];
+    mutableRequest.URL = [self.viewController fixURL:urlString];
+    [self.wkWebView loadRequest:mutableRequest];
 }
 
 @end

@@ -16,9 +16,11 @@
 @property (nonatomic, assign) BOOL pageLoaded;
 
 @property (nonatomic, readwrite, assign) BOOL alreadyLoaded;
+@property (nonatomic, assign) unsigned short port;
 
 - (void)loadURL:(NSURL*)URL;
 - (void)copyLS:(unsigned short)httpPort;
 - (void)setServerPort:(unsigned short) port;
+- (NSURL*)fixURL:(NSString*)URL;
 
 @end

@@ -236,28 +236,27 @@
     }];
 }
 
+- (NSURL*)fixURL:(NSString*)URL
+{
+  if ([URL hasPrefix:@"http"]) {
+    return [NSURL URLWithString:URL];
+  } else if ([URL hasPrefix:@"file"]) {
+    NSString* fixedStartPage = [URL stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+    fixedStartPage = [fixedStartPage stringByReplacingOccurrencesOfString:NSHomeDirectory() withString:@""];
+    return [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%hu%@", self.port, fixedStartPage]];
+  } else {
+    return [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%hu/%@", self.port, URL]];
+  }
+}
+
 - (void)setServerPort:(unsigned short)port
 {
   if (self.alreadyLoaded) {
     // If we already loaded for some reason, we don't care about the local port.
     return;
   } else {
-    if ([self.startPage hasPrefix:@"http"]) {
-      _startURL = [NSURL URLWithString:self.startPage];
-    } else if ([self.startPage hasPrefix:@"file"]) {
-      NSString* fixedStartPage = [self.startPage stringByReplacingOccurrencesOfString:@"file://" withString:@""];
-      fixedStartPage = [fixedStartPage stringByReplacingOccurrencesOfString:NSHomeDirectory() withString:@""];
-      
-      _startURL = [NSURL URLWithString:[NSString stringWithFormat:
-                                        @"http://localhost:%hu%@",
-                                        port,
-                                        fixedStartPage]];
-    } else {
-      _startURL = [NSURL URLWithString:[NSString stringWithFormat:
-                                              @"http://localhost:%hu/%@",
-                                              port,
-                                              self.startPage]];
-    }
+    self.port = port;
+    _startURL = [self fixURL:self.startPage];
     [self loadURL:_startURL];
   }
 }
@@ -405,7 +404,7 @@
     if ([self.webView respondsToSelector:@selector(setKeyboardDisplayRequiresUserAction:)]) {
       [self.webView setValue:[NSNumber numberWithBool:keyboardDisplayRequiresUserAction] forKey:@"keyboardDisplayRequiresUserAction"];
     }
-    
+
     if (!keyboardDisplayRequiresUserAction) {
       [self keyboardDisplayDoesNotRequireUserAction];
     }
@@ -569,6 +568,7 @@
 
   ReroutingUIWebView *e = [[ReroutingUIWebView alloc] initWithFrame:bounds];
   e.wkWebView = cordovaView;
+  e.viewController = self;
   self.webView = e;
   return cordovaView;
 }
