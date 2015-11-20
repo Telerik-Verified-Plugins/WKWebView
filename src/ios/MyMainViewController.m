@@ -244,6 +244,14 @@
   } else {
     if ([self.startPage hasPrefix:@"http"]) {
       _startURL = [NSURL URLWithString:self.startPage];
+    } else if ([self.startPage hasPrefix:@"file"]) {
+      NSString* fixedStartPage = [self.startPage stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+      fixedStartPage = [fixedStartPage stringByReplacingOccurrencesOfString:NSHomeDirectory() withString:@""];
+      
+      _startURL = [NSURL URLWithString:[NSString stringWithFormat:
+                                        @"http://localhost:%hu%@",
+                                        port,
+                                        fixedStartPage]];
     } else {
       _startURL = [NSURL URLWithString:[NSString stringWithFormat:
                                               @"http://localhost:%hu/%@",
