@@ -54,8 +54,6 @@ NSString* appDataFolder;
                                 cacheAge:30
                       allowRangeRequests:YES];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ServerCreatedNotificationName object: @[myMainViewController, _webServer]];
-
     [self addHandlerForPath:@"/Library/"];
     [self addHandlerForPath:@"/Documents/"];
     [self addHandlerForPath:@"/tmp/"];
@@ -125,6 +123,7 @@ NSString* appDataFolder;
       httpPort = [[self.viewController.settings objectForKey:@"wkwebviewpluginembeddedserverport"] intValue];
     }
 
+    _webServer.delegate = (id<GCDWebServerDelegate>)self;
     do {
         [_webServerOptions setObject:[NSNumber numberWithInteger:httpPort++]
                               forKey:GCDWebServerOption_Port];
@@ -136,6 +135,12 @@ NSString* appDataFolder;
         [GCDWebServer setLogLevel:kGCDWebServerLoggingLevel_Warning];
         NSLog(@"Started http daemon: %@ ", _webServer.serverURL);
     }
+}
+
+//MARK:GCDWebServerDelegate
+- (void)webServerDidStart:(GCDWebServer*)server {
+    [NSNotificationCenter.defaultCenter postNotificationName:ServerCreatedNotificationName
+                                                      object: @[self.viewController, _webServer]];
 }
 
 @end
