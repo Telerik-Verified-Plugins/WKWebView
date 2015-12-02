@@ -32,7 +32,7 @@ _BETA_ - things may break, [please post your feedback :)](https://github.com/Edd
 * You can load files from the app's cache folders by using the entire path (/var/.../Library/...) or simply '/Library/..' (or '/Documents/..').
 * This plugin features crash recovery: if the WKWebView crashes, it will auto-restart (otherwise you'd have an app with a blank page as it doesn't crash the app itself). Crash recovery requires a filled `<title>anything</title>` tag in your html files. If you want to disable this feature, set the `config.xml` property `DisableCrashRecovery` to `true`.
 * In order to open links like `tel:` and `mailto:` you need to add `target="_blank"`: `<a href="tel:+31611223344" target="_blank">call!</a>`
-* If you're trying to use `HideFormAccessoryBar` with the `cordova-plugin-keyboard` plugin, please [use version 1.3.1+ of this fork](https://www.npmjs.com/package/cordova-plugin-keyboard-ams) which is compatbile with WKWebView.
+* If you're trying to use `HideFormAccessoryBar` with the `cordova-plugin-keyboard` plugin, please [use version 1.1.3+ of this fork](https://www.npmjs.com/package/cordova-plugin-keyboard) which is compatbile with WKWebView.
 
 ## 2. Screenshot
 This image shows the [SocialSharing plugin](https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin) in action while running [a performance test](https://www.scirra.com/demos/c2/particles/) in an iframe on my iPhone 6 (older devices show an even larger difference).
