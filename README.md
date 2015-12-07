@@ -55,6 +55,8 @@ $ cordova plugin add cordova-plugin-wkwebview --variable WKWEBVIEW_SERVER_PORT=1
 No need for anything else - you can now open the project in XCode 6 if you like.
 
 ## 4. Changelog
+ApiAISDKPlugin
+* __0.6.8__  Compatibility with Telerik's LivePatch plugin. See #202. 
 * __0.6.7__  Compatibility with `file://` protocol for usage in plugins like [cordova-hot-code-push](https://github.com/nordnet/cordova-hot-code-push), thanks #195 and #196!
 * __0.6.5__  `KeyboardDisplayRequiresUserAction` works! So set to `false` if you want the keyboard to pop up when programmatically focussing an input field.
 * __0.6.4__  On top of the port preference introduced in 0.6.3 you can now override the default variable when installing this plugin (see 'Installation').
