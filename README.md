@@ -2,7 +2,7 @@
 by [Eddy Verbruggen](http://twitter.com/eddyverbruggen) / [Telerik](http://www.telerik.com)
 
 
-_iOS9 warning:_ please test your app on iOS 9 and move to the 0.6.0 release if things are broken!
+__At the moment this plugin is NOT compatible with Cordova-iOS-4, see [#209](https://github.com/Telerik-Verified-Plugins/WKWebView/issues/209) for details.__
 
 
 ## 0. Index
