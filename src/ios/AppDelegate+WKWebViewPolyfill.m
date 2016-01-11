@@ -83,7 +83,9 @@ NSString* appDataFolder;
                            return nil;
                        }
                          
-                       return [GCDWebServerFileResponse responseWithFile:fileLocation byteRange:request.byteRange];
+                       GCDWebServerResponse* response = [GCDWebServerFileResponse responseWithFile:fileLocation byteRange:request.byteRange];
+                       [response setValue:@"bytes" forAdditionalHeader:@"Accept-Ranges"];
+                       return response;
                      }
    ];
 }
