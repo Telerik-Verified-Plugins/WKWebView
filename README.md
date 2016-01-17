@@ -2,7 +2,10 @@
 by [Eddy Verbruggen](http://twitter.com/eddyverbruggen) / [Telerik](http://www.telerik.com)
 
 
-__At the moment this plugin is NOT compatible with Cordova-iOS-4, see [#209](https://github.com/Telerik-Verified-Plugins/WKWebView/issues/209) for details.__
+__[Jan 17, 2016] iOS 9.3 BETA seems to require you to set the minimum deployment target to 8.0, otherwise you may see a hanging splashscreen or white startup page. I hope that's fixed in later BETA's, otherwise it may be wise to drop iOS 7 support in your app.__
+
+__[Jan 10, 2016] At the moment this plugin is NOT compatible with Cordova-iOS-4, see [#209](https://github.com/Telerik-Verified-Plugins/WKWebView/issues/209) for details.__
+
 
 ## 0. Index
 
@@ -24,7 +27,6 @@ _BETA_ - things may break, [please post your feedback :)](https://github.com/Edd
 
 ### Take note!
 
-* If you're seeing a white screen after startup, or a 'hanging splashscreen', make suer your Xcode project deployment target is set to iOS 8.0 or higher.
 * For a seamless upgrade to iOS9 this plugin wipes any existing `NSAppTransportSecurity` configuration you may have done (a new feature in iOS9) to allow communication with even HTTP (non-S) backends, like previous iOS versions did. You can and should configure access rules (`config.xml`) and use the whitelist plugin as before.
 * [Ionic](http://ionicframework.com/) tip: to prevent flashes of a black background, make sure you set `ion-nav-view`'s `background-color` to `transparent`.
 * If you need the [device plugin](https://github.com/apache/cordova-plugin-device), use at least Cordova-iOS 3.6.3 (deviceready never fires with 3.5.0 due to a currently unknown reason).
