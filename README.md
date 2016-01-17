@@ -4,7 +4,7 @@ by [Eddy Verbruggen](http://twitter.com/eddyverbruggen) / [Telerik](http://www.t
 
 __[Jan 17, 2016] iOS 9.3 BETA seems to require you to set the minimum deployment target to 8.0, otherwise you may see a hanging splashscreen or white startup page. I hope that's fixed in later BETA's, otherwise it may be wise to drop iOS 7 support in your app.__
 
-__[Jan 10, 2016] At the moment this plugin is NOT compatible with Cordova-iOS-4, see [#209](https://github.com/Telerik-Verified-Plugins/WKWebView/issues/209) for details.__
+__[Jan 10, 2016] At the moment this plugin is NOT compatible with Cordova-iOS-4 (so use 3.x), see [#209](https://github.com/Telerik-Verified-Plugins/WKWebView/issues/209) for details.__
 
 
 ## 0. Index
