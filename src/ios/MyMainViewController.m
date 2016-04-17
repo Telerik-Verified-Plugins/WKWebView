@@ -112,6 +112,8 @@
 
   self.wkWebView = [self newCordovaWKWebViewWithFrame:webViewBounds wkWebViewConfig:config];
   self.wkWebView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+    NSString* allowsBackForwardNavigationGestures = [self settingForKey:@"AllowsBackForwardNavigationGestures"];
+   self.wkWebView.allowsBackForwardNavigationGestures = [allowsBackForwardNavigationGestures boolValue];
 
 /*
 #ifdef __IPHONE_9_0
@@ -263,19 +265,7 @@
 
 - (void)viewDidLoad
 {
-  NSURL* appURL = nil;
-  NSString* loadErr = nil;
-
-  if ([self.startPage rangeOfString:@"://"].location != NSNotFound) {
-    appURL = [NSURL URLWithString:self.startPage];
-  } else if ([self.wwwFolderName rangeOfString:@"://"].location != NSNotFound) {
-    appURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", self.wwwFolderName, self.startPage]];
-  }
-
-  // iOS9 (runtime) compatibility
-  if (IsAtLeastiOSVersion(@"9.0")) {
-    appURL = _startURL;
-  }
+  
 
   //// Fix the iOS 5.1 SECURITY_ERR bug (CB-347), this must be before the webView is instantiated ////
   NSString* backupWebStorageType = @"cloud"; // default value
@@ -456,7 +446,6 @@
         paginationBreakingMode = 0;
       }
     }
-
     // property check for compiling under iOS < 7
     ios7sel = NSSelectorFromString(@"setPaginationBreakingMode:");
     if ([self.webView respondsToSelector:ios7sel]) {
@@ -478,7 +467,6 @@
         paginationMode = 0;
       }
     }
-
     // property check for compiling under iOS < 7
     ios7sel = NSSelectorFromString(@"setPaginationMode:");
     if ([self.webView respondsToSelector:ios7sel]) {
@@ -501,33 +489,45 @@
 
     [CDVTimer stop:@"TotalPluginStartup"];
   }
-
-  if(appURL != nil) {
-    [self loadURL:appURL];
-  } else if(!_targetExistsLocally) {
-    self.alreadyLoaded = true;
-    loadErr = [NSString stringWithFormat:@"ERROR: Start Page at '%@' was not found.",
-               self.startPage];
-    NSLog(@"%@", loadErr);
-    ///////////////////
-    [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
-      _userAgentLockToken = lockToken;
-
-      [CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
-      NSString* html = [NSString stringWithFormat:@"<html><body> %@ </body></html>",
-                        loadErr];
-      [self.wkWebView loadHTMLString:html baseURL:nil];
-    }];
-  } else {
-    // we'll load once the HTTP server starts.
-  }
-
   // Start timer which periodically checks whether the app is alive
   if (![self settingForKey:@"DisableCrashRecovery"] || ![[self settingForKey:@"DisableCrashRecovery"] boolValue]) {
     _crashRecoveryTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(recoverFromCrash) userInfo:nil repeats:YES];
   }
 }
-
+-(void)showPage{
+    NSURL* appURL = nil;
+    NSString* loadErr = nil;
+    
+    if ([self.startPage rangeOfString:@"://"].location != NSNotFound) {
+        appURL = [NSURL URLWithString:self.startPage];
+    } else if ([self.wwwFolderName rangeOfString:@"://"].location != NSNotFound) {
+        appURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", self.wwwFolderName, self.startPage]];
+    }
+    
+    // iOS9 (runtime) compatibility
+    if (IsAtLeastiOSVersion(@"9.0")) {
+        appURL = _startURL;
+    }
+    if(appURL != nil) {
+        [self loadURL:appURL];
+    } else if(!_targetExistsLocally) {
+        self.alreadyLoaded = true;
+        loadErr = [NSString stringWithFormat:@"ERROR: Start Page at '%@' was not found.",
+                   self.startPage];
+        NSLog(@"%@", loadErr);
+        ///////////////////
+        [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
+            _userAgentLockToken = lockToken;
+            
+            [CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
+            NSString* html = [NSString stringWithFormat:@"<html><body> %@ </body></html>",
+                              loadErr];
+            [self.wkWebView loadHTMLString:html baseURL:nil];
+        }];
+    } else {
+        // we'll load once the HTTP server starts.
+    }
+}
 - (void) copyLS:(unsigned short)httpPort
 {
   // Copy LS of UIWebView to WKWebView so upgrading to the new webview is less of a pain in the ..

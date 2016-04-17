@@ -48,6 +48,7 @@ NSString* appDataFolder;
     // don't restart the webserver if we don't have to (fi. after a crash, see #223)
     if (_webServer != nil && [_webServer isRunning]) {
         [myMainViewController setServerPort:_webServer.port];
+        [myMainViewController showPage];
         return;
     }
 
@@ -73,6 +74,8 @@ NSString* appDataFolder;
 
     // Update Swizzled ViewController with port currently used by local Server
     [myMainViewController setServerPort:_webServer.port];
+    [myMainViewController showPage];
+    
 }
 
 - (void)addHandlerForPath:(NSString *) path {

@@ -73,7 +73,7 @@
     <source-file src="src/ios/CDVWebViewUIDelegate.m"/>
     
     <dependency id="cordova-plugin-webserver" />
-
+    <preference name="AllowsBackForwardNavigationGestures" default="false" />
   </platform>
 
 </plugin>
