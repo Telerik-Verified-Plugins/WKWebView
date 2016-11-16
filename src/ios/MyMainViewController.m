@@ -103,6 +103,18 @@
   }
 }
 
+#pragma mark View Rotation Event Handling
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        self.wkWebView.frame = self.view.bounds;
+        [self.wkWebView layoutIfNeeded];
+    } completion:nil];
+}
+
 #pragma mark View lifecycle
 
 - (void)createGapView:(WKWebViewConfiguration*) config
