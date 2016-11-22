@@ -1,5 +1,5 @@
 {
-    "version": "0.6.9",
+    "version": "0.6.10",
     "name": "cordova-plugin-wkwebview",
     "cordova_name": "WKWebView Polyfill",
     "description": "A drop-in replacement of UIWebView for boosted performance and enhanced HTML5 support",
