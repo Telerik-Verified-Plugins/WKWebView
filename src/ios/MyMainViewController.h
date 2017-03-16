@@ -22,5 +22,5 @@
 - (void)copyLS:(unsigned short)httpPort;
 - (void)setServerPort:(unsigned short) port;
 - (NSURL*)fixURL:(NSString*)URL;
-
+-(void)showPage;
 @end
