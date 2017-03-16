@@ -22,8 +22,7 @@
   <preference name="WKWEBVIEW_SERVER_PORT" default="12344" />
 
   <engines>
-    <engine name="cordova" version=">=3.0.0"/>
-    <engine name="cordova" version="<4.0.0" />
+    <engine name="cordova-ios" version=">=3.0.0 <4.0.0"/>
   </engines>
 
   <!-- ios -->
@@ -72,7 +71,7 @@
     <source-file src="src/ios/CDVWebViewOperationsDelegate.m"/>
     <header-file src="src/ios/CDVWebViewUIDelegate.h"/>
     <source-file src="src/ios/CDVWebViewUIDelegate.m"/>
-    
+
     <dependency id="cordova-plugin-webserver" />
 
   </platform>
