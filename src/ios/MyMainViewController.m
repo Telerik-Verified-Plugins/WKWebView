@@ -535,7 +535,8 @@
   }
 
   // Start timer which periodically checks whether the app is alive
-  if (![self settingForKey:@"DisableCrashRecovery"] || ![[self settingForKey:@"DisableCrashRecovery"] boolValue]) {
+  if ([[self settingForKey:@"EnableCrashRecovery"] boolValue]) {
+    NSLog(@"NOTICE: Crash recovery enabled, this relies on checking page title and a blank title can trigger recovery");
     _crashRecoveryTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(recoverFromCrash) userInfo:nil repeats:YES];
   }
 }
